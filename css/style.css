@@ -5,7 +5,7 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 .header {
-    font-size: 20px;
+    height: 50px;
 }
 .row:after {
     content: "";
@@ -15,20 +15,15 @@ body {
 .col {
     float: left;
     padding: 10px;
-    height: 800px;
+    height: 900px;
 }
 
 .col.scatter {
     width: 80%;
     background-color: aliceblue;
 }
-.col.scatter.legend {
-    width: 10%;
-    height: 100%;
-    background-color: khaki;
-}
 .col.scatter.plot {
-    width: 80%;
+    width: 90%;
     height: 100%;
     background-color: lightblue;
 }
@@ -36,6 +31,7 @@ body {
     width: 10%;
     height: 100%;
     background-color: gainsboro;
+    overflow-y: scroll;
 }
 
 .col.util {
