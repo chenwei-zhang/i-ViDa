@@ -38,6 +38,7 @@ d3.json('data/PT3_dna.json').then((data) => {
             };
             pt3_trj.push(trj_data);
         });
+        console.log(pt3_trj[pt3_trj.length-1]);
     });
 }).then(() => {
     var svg = d3.select('#scatter').append('svg')
@@ -46,15 +47,15 @@ d3.json('data/PT3_dna.json').then((data) => {
         .attr("clip-path", "url(#clip)")
     var width = $('#scattersvg').width();
     var height = $('#scattersvg').height();
-    var x = d3.scaleLinear().domain([d3.min(pt3_dna, (dna)=> dna.pca_x), d3.max(pt3_dna, (dna)=> dna.pca_x)])
+    var x = d3.scaleLinear().domain([d3.min(pt3_dna, (dna)=> dna.pca_x), d3.max(pt3_dna, (dna)=> dna.pca_x)+2])
         .range([0, width]);
     var y = d3.scaleLinear()
-        .domain([d3.min(pt3_dna, (dna)=> dna.pca_y), d3.max(pt3_dna, (dna)=> dna.pca_y)])
+        .domain([d3.min(pt3_dna, (dna)=> dna.pca_y), d3.max(pt3_dna, (dna)=> dna.pca_y)+2])
         .range([height, 0]);
     var c = d3.scaleLinear().domain([d3.min(pt3_dna, (dna)=> dna.energy), d3.max(pt3_dna, (dna)=> dna.energy)])
         .range(["red", "lightgreen"])
     var r = d3.scaleSqrt().domain([d3.min(pt3_dna, (dna)=> dna.time), d3.max(pt3_dna, (dna)=> dna.time)])
-        .range([2, 5])
+        .range([2, 20])
     var xaxis = svg.append("g")
         .call(d3.axisBottom(x));
     var yaxis = svg.append("g")
@@ -82,6 +83,16 @@ d3.json('data/PT3_dna.json').then((data) => {
     .style("fill", (dna)=>c(dna.energy))
     .attr('stroke', 'grey')
     .attr('stroke-width', '1px')
+
+    svg.append('circle')
+    .attr("cx", x(pt3_dna[0].pca_x))
+    .attr("cy", y(pt3_dna[0].pca_y))
+    .attr("r", 40)
+
+    svg.append('circle')
+    .attr("cx", x(pt3_dna[169].pca_x))
+    .attr("cy", y(pt3_dna[169].pca_y))
+    .attr("r", 40)
 
     var brush = d3.brush()
         .extent( [ [0,0], [width,height] ] )
