@@ -59,14 +59,13 @@ d3.json('data/PT3_dna.json').then((data) => {
         .call(d3.axisBottom(x));
     var yaxis = svg.append("g")
         .call(d3.axisLeft(y));
-    var clip = svg.append("defs").append("SVG:clipPath")
+    svg.append("defs").append("SVG:clipPath")
         .attr("id", "clip")
         .append("SVG:rect")
         .attr("width", width )
         .attr("height", height )
         .attr("x", 0)
         .attr("y", 0);
-
 
     var circles = svg.append('g')
         .selectAll(".dot")
@@ -84,28 +83,33 @@ d3.json('data/PT3_dna.json').then((data) => {
     .attr('stroke', 'grey')
     .attr('stroke-width', '1px')
 
+    var brush = d3.brush()
+        .extent( [ [0,0], [width,height] ] )
+        .on("end", updateChart)
+    svg.append("g")
+        .attr("class", "brush")
+        .call(brush);
+    var idleTimeout
+    function idled() { idleTimeout = null; }
+    function updateChart(event) {
+        extent = event.selection;
 
-    var zoom = d3.zoom()
-      .scaleExtent([.5, 20])  // This control how much you can unzoom (x0.5) and zoom (x20)
-      .extent([[0, 0], [width, height]])
-      .on("zoom", updateChart);
-    svg.append("rect")
-      .attr("width", width)
-      .attr("height", height)
-      .style("fill", "none")
-      .style("pointer-events", "all")
-      .call(zoom);
-    function updateChart() {
-        // recover the new scale
-        var newX = d3.zoomTransform(this).rescaleX(x);
-        var newY = d3.zoomTransform(this).rescaleY(y);
-        // update axes with these new boundaries
-        xaxis.call(d3.axisBottom(newX))
-        yaxis.call(d3.axisLeft(newY))
-        // update circle position
+        // If no selection, back to initial coordinate. Otherwise, update X axis domain
+        if(!extent){
+            if (!idleTimeout) return idleTimeout = setTimeout(idled, 350);
+            x.domain([d3.min(pt3_dna, (dna)=> dna.pca_x), d3.max(pt3_dna, (dna)=> dna.pca_x)])
+            y.domain([d3.min(pt3_dna, (dna)=> dna.pca_y), d3.max(pt3_dna, (dna)=> dna.pca_y)])
+        }else{
+            x.domain([x.invert(extent[0][0]), x.invert(extent[1][0])])
+            y.domain([y.invert(extent[0][1]), y.invert(extent[1][1])])
+            svg.select(".brush").call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
+        }
+
+        xaxis.call(d3.axisBottom(x))
+        yaxis.call(d3.axisLeft(y))
         svg.selectAll(".dot")
-          .attr('cx', function(d) {return newX(d.pca_x)})
-          .attr('cy', function(d) {return newY(d.pca_y)});
+            .attr("cx", function (d) { return x(d.pca_x); } )
+            .attr("cy", function (d) { return y(d.pca_y); } )
     }
 }).then(()=>{console.log(new Date().getTime()-start);});
 
