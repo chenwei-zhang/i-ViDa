@@ -50,9 +50,10 @@
       seg.attr("stroke-dashoffset", length*0.4).transition()
       .attr('stroke-opacity',10000)
       .duration(segData[0].t*3000)
-      .delay(segData[0].d*3000)
+      .delay(0*segData[0].d*3000)
       .attr('stroke-dasharray', length*0.4+" "+length)
       .attr("stroke-dashoffset", -length)
+      .on('end', animateSeg)
     }
     function animateTrail(){
       var trail = d3.select(this);
