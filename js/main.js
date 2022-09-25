@@ -38,7 +38,6 @@ d3.json('data/PT3_dna.json').then((data) => {
             };
             pt3_trj.push(trj_data);
         });
-        console.log(pt3_trj[pt3_trj.length-1]);
     });
 }).then(() => {
     var svg = d3.select('#scatter').append('svg')
@@ -75,25 +74,17 @@ d3.json('data/PT3_dna.json').then((data) => {
         .enter()
         .append("circle")
         .attr('class', 'dot')
-        .attr('id', (d)=>d.id);
+        .attr('id', (d)=>{return d.id});
     circlesEnter.merge(circles)
     .attr("cx", (dna)=>x(dna.pca_x))
     .attr("cy",  (dna)=>y(dna.pca_y))
-    .attr("r", (dna)=>r(dna.time))
-    .style("fill", (dna)=>c(dna.energy))
+    .attr("r", (dna)=>{if(dna.id==0||dna.id==169) return 40; else return r(dna.time)})
+    .attr("fill", (dna)=>{return c(dna.energy)})
     .attr('stroke', 'grey')
     .attr('stroke-width', '1px')
-
-    svg.append('circle')
-    .attr("cx", x(pt3_dna[0].pca_x))
-    .attr("cy", y(pt3_dna[0].pca_y))
-    .attr("r", 40)
-
-    svg.append('circle')
-    .attr("cx", x(pt3_dna[169].pca_x))
-    .attr("cy", y(pt3_dna[169].pca_y))
-    .attr("r", 40)
-
+    var endpoints = d3.selectAll('.dot').filter((d)=>{return d.id===0||d.id===169});
+    endpoints.attr('fill', 'blue');
+    endpoints.raise();
     var brush = d3.brush()
         .extent( [ [0,0], [width,height] ] )
         .on("end", updateChart)
