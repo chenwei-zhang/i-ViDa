@@ -46,13 +46,13 @@ d3.json('data/PT3_dna.json').then((data) => {
         .attr("clip-path", "url(#clip)")
     var width = $('#scattersvg').width();
     var height = $('#scattersvg').height();
-    var x = d3.scaleLinear().domain([d3.min(pt3_dna, (dna)=> dna.pca_x), d3.max(pt3_dna, (dna)=> dna.pca_x)+2])
+    var x = d3.scaleLinear().domain([d3.min(pt3_dna, (dna)=> dna.pca_x)-2, d3.max(pt3_dna, (dna)=> dna.pca_x)+2])
         .range([0, width]);
     var y = d3.scaleLinear()
-        .domain([d3.min(pt3_dna, (dna)=> dna.pca_y), d3.max(pt3_dna, (dna)=> dna.pca_y)+2])
+        .domain([d3.min(pt3_dna, (dna)=> dna.pca_y)-2, d3.max(pt3_dna, (dna)=> dna.pca_y)+2])
         .range([height, 0]);
     var c = d3.scaleLinear().domain([d3.min(pt3_dna, (dna)=> dna.energy), d3.max(pt3_dna, (dna)=> dna.energy)])
-        .range(["red", "lightgreen"])
+        .range(["black", "white"])
     var r = d3.scaleSqrt().domain([d3.min(pt3_dna, (dna)=> dna.time), d3.max(pt3_dna, (dna)=> dna.time)])
         .range([2, 20])
     var xaxis = svg.append("g")
@@ -72,6 +72,8 @@ d3.json('data/PT3_dna.json').then((data) => {
         .data(pt3_dna, (d)=> d.id)
     var circlesEnter = circles
         .enter()
+        .append('g')
+        .attr('class', 'dotgroup')
         .append("circle")
         .attr('class', 'dot')
         .attr('id', (d)=>{return d.id});
@@ -82,8 +84,9 @@ d3.json('data/PT3_dna.json').then((data) => {
     .attr("fill", (dna)=>{return c(dna.energy)})
     .attr('stroke', 'grey')
     .attr('stroke-width', '1px')
-    var endpoints = d3.selectAll('.dot').filter((d)=>{return d.id===0||d.id===169});
-    endpoints.attr('fill', 'blue');
+    var endpoints = d3.selectAll('.dotgroup').filter((d)=>{return d.id===0||d.id===169});
+    endpoints.append('text').attr('class', 'label').text('I').attr('font-size', 30).attr('transform', (d)=>{return `translate(${x(d.pca_x)}, ${y(d.pca_y)})`});
+    endpoints.select('.dot').attr('fill', 'blue');
     endpoints.raise();
     var brush = d3.brush()
         .extent( [ [0,0], [width,height] ] )
@@ -99,8 +102,8 @@ d3.json('data/PT3_dna.json').then((data) => {
         // If no selection, back to initial coordinate. Otherwise, update X axis domain
         if(!extent){
             if (!idleTimeout) return idleTimeout = setTimeout(idled, 350);
-            x.domain([d3.min(pt3_dna, (dna)=> dna.pca_x), d3.max(pt3_dna, (dna)=> dna.pca_x)])
-            y.domain([d3.min(pt3_dna, (dna)=> dna.pca_y), d3.max(pt3_dna, (dna)=> dna.pca_y)])
+            x.domain([d3.min(pt3_dna, (dna)=> dna.pca_x)-2, d3.max(pt3_dna, (dna)=> dna.pca_x)+2])
+            y.domain([d3.min(pt3_dna, (dna)=> dna.pca_y)-2, d3.max(pt3_dna, (dna)=> dna.pca_y)+2])
         }else{
             x.domain([x.invert(extent[0][0]), x.invert(extent[1][0])])
             y.domain([y.invert(extent[0][1]), y.invert(extent[1][1])])
@@ -112,6 +115,8 @@ d3.json('data/PT3_dna.json').then((data) => {
         svg.selectAll(".dot")
             .attr("cx", function (d) { return x(d.pca_x); } )
             .attr("cy", function (d) { return y(d.pca_y); } )
+        svg.selectAll(".label")
+            .attr('transform', (d)=>{return `translate(${x(d.pca_x)}, ${y(d.pca_y)})`});
     }
 }).then(()=>{console.log(new Date().getTime()-start);});
 
