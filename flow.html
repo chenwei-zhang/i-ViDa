@@ -50,9 +50,10 @@
       seg.attr("stroke-dashoffset", length*0.4).transition()
       .attr('stroke-opacity',10000)
       .duration(segData[0].t*3000)
-      .delay(segData[0].d*3000)
+      .delay(0*segData[0].d*3000)
       .attr('stroke-dasharray', length*0.4+" "+length)
       .attr("stroke-dashoffset", -length)
+      .on('end', animateSeg)
     }
     function animateTrail(){
       var trail = d3.select(this);
@@ -68,6 +69,11 @@
     //d3.selectAll('.traceline').each(animateTrail);
     d3.selectAll('.flowline').each(animateSeg);
     d3.selectAll('.traceline').each(animateTrail);
+    svg.append('circle').attr('cx', 100).attr('cy', 100).attr('r', 4);
+    svg.append('circle').attr('cx', 300).attr('cy', 100).attr('r', 4);
+    svg.append('circle').attr('cx', 200).attr('cy', 300).attr('r', 8);
+    svg.append('circle').attr('cx', 300).attr('cy', 250).attr('r', 7);
+    svg.append('circle').attr('cx', 700).attr('cy', 400).attr('r', 2);
   </script>
 </body>
 

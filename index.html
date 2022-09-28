@@ -6,18 +6,22 @@
 </head>
 <body class="page">
     <div class="header">
-        <h1>VisDNA Title Placeholder</h1>
+        <h2>VisDNA Title Placeholder</h2>
     </div>
     <div class="row">
-        <div class="col scatter">
-            <div class="col scatter legend">legend</div>
-            <div class="col scatter plot">plot</div>
-            <div class="col scatter trace">trace</div>
+        <div class="vis1">
+            <div id="scatter"></div>
+            <div id="trajectory">trace</div>
         </div>
-        <div class="col util">
-            <div class="col util dna"> DNA Vis Placeholder</div>
-            <div class="col util bar">Barchart Placeholder</div>
+        <div class="vis2">
+            <div id="structure"> DNA Vis Placeholder</div>
+            <div id="bar">Barchart Placeholder</div>
         </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>    
+    <script src="js/d3.v6.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/graph.js"></script>
 </body>
 </html>

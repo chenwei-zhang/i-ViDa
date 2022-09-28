@@ -1,54 +1,47 @@
-* {
-    box-sizing:border-box;
-}
 body {
     font-family: Arial, Helvetica, sans-serif;
 }
 .header {
-    font-size: 20px;
+    height: 50px;
 }
-.row:after {
-    content: "";
-    display: table;
-    clear: both;
-}
-.col {
-    float: left;
-    padding: 10px;
-    height: 800px;
+.row {
+    display: flex;
+    flex-direction: row;
+    margin: 0 auto;
 }
 
-.col.scatter {
-    width: 80%;
-    background-color: aliceblue;
+.vis1 {
+    display: flex;
+    flex-direction: row;
 }
-.col.scatter.legend {
-    width: 10%;
-    height: 100%;
-    background-color: khaki;
+
+#scatter {
+    padding: 30px;
+    height: 900px;
 }
-.col.scatter.plot {
-    width: 80%;
-    height: 100%;
-    background-color: lightblue;
+.tick {
+    stroke-opacity: 0.5;
+    stroke-dasharray: 2,2;
+    fill: grey;
 }
-.col.scatter.trace {
-    width: 10%;
-    height: 100%;
+#trajectory {
+    width: 100px;
+    height: 900px;
     background-color: gainsboro;
 }
 
-.col.util {
-    width: 20%;
+.vis2 {
+    display: flex;
+    flex-direction: column;
     background-color:antiquewhite;
 }
-.col.util.dna {
-    width: 100%;
-    height: 60%;
+#structure {
+    width: 300px;
+    height: 540px;
     background-color: salmon;
 }
-.col.util.bar {
-    width: 100%;
-    height: 40%;
+#bar {
+    width: 300px;
+    height: 360px;
     background-color:cadetblue;
 }
