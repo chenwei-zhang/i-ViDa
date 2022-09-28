@@ -19,6 +19,11 @@ body {
     padding: 30px;
     height: 900px;
 }
+.tick {
+    stroke-opacity: 0.5;
+    stroke-dasharray: 2,2;
+    fill: grey;
+}
 #trajectory {
     width: 100px;
     height: 900px;

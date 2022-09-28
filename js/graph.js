@@ -22,20 +22,21 @@ class DNAGraph {
         vis.height = vis.config.containerHeight - vis.margin.top - vis.margin.bottom;
         
         // pos scale
+        vis.scaleExtra = 1.1;
         vis.yScale = d3.scaleLinear()
-            .domain([d3.min(vis.states, (d) => d.pca_y)*1.05, d3.max(vis.states, (d) => d.pca_y)*1.05])
+            .domain([d3.min(vis.states, (d) => d.pca_y)*vis.scaleExtra, d3.max(vis.states, (d) => d.pca_y)*vis.scaleExtra])
             .range([vis.height, 0]);
         vis.xScale = d3.scaleLinear()
-            .domain([d3.min(vis.states, (d) => d.pca_x)*1.05, d3.max(vis.states, (d) => d.pca_x)*1.05])
+            .domain([d3.min(vis.states, (d) => d.pca_x)*vis.scaleExtra, d3.max(vis.states, (d) => d.pca_x)*vis.scaleExtra])
             .range([0, vis.width]);
         // color scale
         vis.cScale = d3.scaleLinear()
             .domain([d3.min(vis.states, (d)=> d.energy), d3.max(vis.states, (d)=> d.energy)])
-            .range([0,1]);
+            .range([0,0.7]);
         // size scale
         vis.rScale = d3.scaleSqrt()
             .domain([d3.min(vis.states, (d)=> d.time), d3.max(vis.states, (d)=> d.time)])
-            .range([2, 20]);
+            .range([2, 15]);
         
             // svg of the vis
         vis.svg = d3.select(vis.config.parentElement)
@@ -50,8 +51,8 @@ class DNAGraph {
             .attr('transform', `translate(${vis.margin.left}, ${vis.margin.top})`);
         
         // axis group
-        vis.xAxis = d3.axisBottom(vis.xScale);
-        vis.yAxis = d3.axisLeft(vis.yScale);
+        vis.xAxis = d3.axisBottom(vis.xScale).tickSize(-vis.height);
+        vis.yAxis = d3.axisLeft(vis.yScale).tickSize(-vis.width);
         vis.xAxisG = vis.chart
             .append('g')
             .attr('class', 'axis x-axis')
@@ -112,13 +113,14 @@ class DNAGraph {
                 if(d.id == vis.Iid || d.id == vis.Fid){
                     return 10;
                 } else {
+
                     return vis.rScale(d.time);
                 }
             }).attr('fill', (d) => {
                 if(d.id == vis.Iid || d.id == vis.Fid){
                     return 'green';
                 } else {
-                    return d3.interpolatePlasma(vis.cScale(d.energy));
+                    return d3.interpolateOrRd(vis.cScale(d.energy));
                 }
             }).attr('stroke', 'grey')
             .attr('stroke-width', '0.5px')
@@ -148,18 +150,85 @@ class DNAGraph {
         nodesEnter.exit().remove();
 
         // draw a path
-        console.log(vis.trajectory)
+        vis.trajectory.forEach((t) => {
+            var connection = [];
+            for(let i = 0; i < t.trj.length-1; i += 1){
+                const curr = t.trj[i];
+                const next = t.trj[i+1];
+                connection.push({x1: curr.pca_x, y1: curr.pca_y, x2: next.pca_x, y2: next.pca_y, time: t.time[i]})
+            }
+            var paths = vis.chart.append('g').attr('class', 'trj-container').attr('clip-path', 'url(#clip)')
+                .selectAll('.particle')
+                .data(connection);
+            var pathsEnter = paths
+                .enter().append('g')
+                .attr('class', 'trj-group')
+                .append('rect')
+                .attr('class', 'particle');
+            // paths encoding trj info
+            pathsEnter.merge(paths)
+                .attr('x', (d) => vis.xScale(d.x1))
+                .attr('y', (d) => vis.yScale(d.y1))
+                .attr('width', 4)
+                .attr('height', 4)
+                .attr('fill', (d) => {const color = ['green', 'blue']; return t.id==57? color[0]:color[1];})
+                .attr('opacity', 0)
+        });
         var paths = vis.chart.append('g').attr('class', 'path-container').attr('clip-path', 'url(#clip)')
-            .selectAll('.trj')
-            .data(vis.trajectory, (d)=> d.id);
-        var pathsEnter = paths
-            .enter().append('g')
-            .attr('class', 'path-group')
-            .append('path')
-            .attr('class', 'trj')
-            .attr('id', (d) => d.id);
-        // paths encoding trj info
-        pathsEnter.merge(nodes)
+                .selectAll('.trj')
+                .data(vis.trajectory, (d) => d.id);
+            var pathsEnter = paths
+                .enter().append('g')
+                .attr('class', 'path-group')
+                .append('path')
+                .attr('class', 'trj')
+                .attr('id', (d) => d.id);
+            // paths encoding trj info
+            pathsEnter.merge(paths)
+                .attr('d', (d) => {
+                    const indices = d.trj;
+                    var pos = [];
+                    indices.forEach((i) => {
+                        pos.push({x: i.pca_x, y: i.pca_y});
+                    })
+                    var gen = d3.line()
+                        .x((d) => vis.xScale(d.x))
+                        .y((d) => vis.yScale(d.y))
+                        .curve(d3.curveLinear);
+                    return gen(pos);
+                }).attr('fill', 'none')
+                .attr('stroke', (d) => {const color = ['green', 'blue']; return d.id==57? color[0]:color[1];})
+                .attr('stroke-width', 2)
+                .attr('opacity', 0.3)
+                //.attr('display', 'none');
+    }
+
+    idled() {
+        let vis = this;
+        vis.idleTimeout = null; 
+    }
+    updateChart(event) {
+        let vis = this;
+        let extent = event.selection;
+        if(!extent){
+            if (!idleTimeout) return idleTimeout = setTimeout(vis.idled, 350);
+            vis.xScale.domain([d3.min(vis.states, (d)=> d.pca_x)*vis.scaleExtra, d3.max(vis.states, (d)=> d.pca_x)*vis.scaleExtra]);
+            vis.yScale.domain([d3.min(vis.states, (d)=> d.pca_y)*vis.scaleExtra, d3.max(vis.states, (d)=> d.pca_y)*vis.scaleExtra]);
+        }else{
+            vis.xScale.domain([vis.xScale.invert(extent[0][0]), vis.xScale.invert(extent[1][0])]);
+            vis.yScale.domain([vis.yScale.invert(extent[1][1]), vis.yScale.invert(extent[0][1])]);
+            vis.chart.select(".brush").call(vis.brush.move, null);
+        }
+
+        vis.xAxisG.call(d3.axisBottom(vis.xScale).tickSize(-vis.height));
+        vis.yAxisG.call(d3.axisLeft(vis.yScale).tickSize(-vis.width));
+        vis.chart.selectAll('.particle')
+            .attr('x', function (d) { return vis.xScale(d3.select(this).attr('x')); } )
+            .attr('y', function (d) { return vis.yScale(d3.select(this).attr('y')); } )
+        vis.chart.selectAll('.node')
+            .attr('cx', function (d) { return vis.xScale(d.pca_x); } )
+            .attr('cy', function (d) { return vis.yScale(d.pca_y); } )
+        vis.chart.selectAll('.trj')
             .attr('d', (d) => {
                 const indices = d.trj;
                 var pos = [];
@@ -171,52 +240,12 @@ class DNAGraph {
                     .y((d) => vis.yScale(d.y))
                     .curve(d3.curveLinear);
                 return gen(pos);
-            }).attr('fill', 'none')
-            .attr('stroke', (d)=> {var colors = ["#1b9e77","#d95f02","#7570b3"]; return colors[d.id];})
-            .attr('stroke-width', 1);
-    }
-
-    idled() {
-        let vis = this;
-        vis.idleTimeout = null; 
-    }
-    updateChart(event) {
-        let vis = this;
-        let extent = event.selection;
-        console.log(extent);
-        if(!extent){
-            if (!idleTimeout) return idleTimeout = setTimeout(vis.idled, 350);
-            vis.xScale.domain([d3.min(vis.states, (d)=> d.pca_x), d3.max(vis.states, (d)=> d.pca_x)]);
-            vis.yScale.domain([d3.min(vis.states, (d)=> d.pca_y), d3.max(vis.states, (d)=> d.pca_y)]);
-        }else{
-            vis.xScale.domain([vis.xScale.invert(extent[0][0]), vis.xScale.invert(extent[1][0])]);
-            vis.yScale.domain([vis.yScale.invert(extent[1][1]), vis.yScale.invert(extent[0][1])]);
-            vis.chart.select(".brush").call(vis.brush.move, null);
-        }
-
-        vis.xAxisG.call(d3.axisBottom(vis.xScale))
-        vis.yAxisG.call(d3.axisLeft(vis.yScale))
-        vis.chart.selectAll('.node')
-            .attr('cx', function (d) { return vis.xScale(d.pca_x); } )
-            .attr('cy', function (d) { return vis.yScale(d.pca_y); } )
-            console.log('here');
-        vis.chart.selectAll('.trj')
-            .attr('d', (d) => {
-                const indices = d.trj;
-                var pos = [];
-                indices.forEach((i) => {
-                    pos.push({x: i.pca_x, y: i.pca_y});
-                })
-                var gen = d3.line()
-                    .x((d) => vis.xScale(d.x))
-                    .y((d) => vis.yScale(d.y))
-                    .curve(d3.curveCardinal);
-                return gen(pos);
             });
         vis.chart.selectAll('.label')
             .attr('transform', (d)=>{return `translate(${vis.xScale(d.pca_x)}, ${vis.yScale(d.pca_y)})`});
         vis.chart.selectAll('.node-container').raise();
         vis.chart.selectAll('.path-container').raise();
+        vis.chart.selectAll('.trj-container').raise();
     }
 
 }
