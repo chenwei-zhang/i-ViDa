@@ -32,7 +32,7 @@ class DNAGraph {
         // color scale
         vis.cScale = d3.scaleLinear()
             .domain([d3.min(vis.states, (d)=> d.energy), d3.max(vis.states, (d)=> d.energy)])
-            .range([0,0.7]);
+            .range([0, 1]);
         // size scale
         vis.rScale = d3.scaleSqrt()
             .domain([d3.min(vis.states, (d)=> d.time), d3.max(vis.states, (d)=> d.time)])
@@ -43,12 +43,19 @@ class DNAGraph {
             .append('svg')
             .attr('id', 'scatter-svg')
             .attr('width', vis.config.containerWidth)
-            .attr('height', vis.config.containerHeight);
+            .attr('height', vis.config.containerHeight)
         // chart
         vis.chart = vis.svg
             .append('g')
             .attr('id', 'scatter-chart')
+            .attr('width', vis.width)
+            .attr('height', vis.height)
             .attr('transform', `translate(${vis.margin.left}, ${vis.margin.top})`);
+        vis.chart.append('rect')
+            .attr('width', vis.width)
+            .attr('height', vis.height)
+            .attr('fill', '#e5ecf6')
+            .attr('opacity', 0.6);
         
         // axis group
         vis.xAxis = d3.axisBottom(vis.xScale).tickSize(-vis.height);
@@ -120,9 +127,9 @@ class DNAGraph {
                 if(d.id == vis.Iid || d.id == vis.Fid){
                     return 'green';
                 } else {
-                    return d3.interpolateOrRd(vis.cScale(d.energy));
+                    return d3.interpolatePlasma(vis.cScale(d.energy));
                 }
-            }).attr('stroke', 'grey')
+            }).attr('stroke', 'white')
             .attr('stroke-width', '0.5px')
             .on('mouseover', (e, d) => {
                 console.log('Show tooltip of DNA id '+d.id);

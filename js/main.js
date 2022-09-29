@@ -68,7 +68,7 @@ d3.json('data/PT3_dna.json').then((data) => {
                 margin: {left: 30, right: 20, top: 20, bottom: 20},
             },
             pt3_dna_filtered,
-            [pt3_trj_filtered[0], pt3_trj_filtered[13]],
+            [pt3_trj_filtered[0], pt3_trj_filtered[10]],
         );
         graph.updateVis();
         d3.selectAll('.particle').each(moveParticles);
