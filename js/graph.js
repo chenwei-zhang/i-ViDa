@@ -37,6 +37,10 @@ class DNAGraph {
         vis.rScale = d3.scaleSqrt()
             .domain([d3.min(vis.states, (d)=> d.time), d3.max(vis.states, (d)=> d.time)])
             .range([2, 15]);
+        // time scale
+        vis.tScale = d3.scaleLinear()
+            .domain([d3.min(vis.states, (d)=> d.time), d3.max(vis.states, (d)=> d.time)])
+            .range([0, 1]);
         
             // svg of the vis
         vis.svg = d3.select(vis.config.parentElement)
@@ -162,23 +166,24 @@ class DNAGraph {
             for(let i = 0; i < t.trj.length-1; i += 1){
                 const curr = t.trj[i];
                 const next = t.trj[i+1];
+                console.log(curr.dp);
                 connection.push({x1: curr.pca_x, y1: curr.pca_y, x2: next.pca_x, y2: next.pca_y, time: t.time[i]})
             }
-            var paths = vis.chart.append('g').attr('class', 'trj-container').attr('clip-path', 'url(#clip)')
+            var particles = vis.chart.append('g').attr('class', 'trj-container').attr('clip-path', 'url(#clip)')
                 .selectAll('.particle')
                 .data(connection);
-            var pathsEnter = paths
+            var particlesEnter = particles
                 .enter().append('g')
                 .attr('class', 'trj-group')
                 .append('rect')
                 .attr('class', 'particle');
             // paths encoding trj info
-            pathsEnter.merge(paths)
+            particlesEnter.merge(particles)
                 .attr('x', (d) => vis.xScale(d.x1))
                 .attr('y', (d) => vis.yScale(d.y1))
                 .attr('width', 4)
                 .attr('height', 4)
-                .attr('fill', (d) => {const color = ['green', 'blue']; return t.id==57? color[0]:color[1];})
+                .attr('fill', (d) => {return d3.interpolateCividis(vis.tScale(d.time));})
                 .attr('opacity', 0)
         });
         var paths = vis.chart.append('g').attr('class', 'path-container').attr('clip-path', 'url(#clip)')
@@ -195,7 +200,7 @@ class DNAGraph {
                 .attr('d', (d) => {
                     const indices = d.trj;
                     var pos = [];
-                    indices.forEach((i) => {
+                    indices.forEach((i, idx) => {
                         pos.push({x: i.pca_x, y: i.pca_y});
                     })
                     var gen = d3.line()
@@ -206,7 +211,7 @@ class DNAGraph {
                 }).attr('fill', 'none')
                 .attr('stroke', (d) => {const color = ['green', 'blue']; return d.id==57? color[0]:color[1];})
                 .attr('stroke-width', 2)
-                .attr('opacity', 0.3)
+                .attr('opacity', 0.1)
                 //.attr('display', 'none');
     }
 
@@ -229,9 +234,7 @@ class DNAGraph {
 
         vis.xAxisG.call(d3.axisBottom(vis.xScale).tickSize(-vis.height));
         vis.yAxisG.call(d3.axisLeft(vis.yScale).tickSize(-vis.width));
-        vis.chart.selectAll('.particle')
-            .attr('x', function (d) { return vis.xScale(d3.select(this).attr('x')); } )
-            .attr('y', function (d) { return vis.yScale(d3.select(this).attr('y')); } )
+        vis.chart.selectAll('.particle').attr('opacity', 0);
         vis.chart.selectAll('.node')
             .attr('cx', function (d) { return vis.xScale(d.pca_x); } )
             .attr('cy', function (d) { return vis.yScale(d.pca_y); } )
