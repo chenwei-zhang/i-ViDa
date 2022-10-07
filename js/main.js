@@ -44,7 +44,7 @@ d3.json('data/PT3_dna.json').then((data) => {
             };
             pt3_trj.push(trj_data);
         });
-        //pt3_trj = pt3_trj.sort((a,b) => a.trj.length - b.trj.length);
+        pt3_trj = pt3_trj.sort((a,b) => a.trj.length - b.trj.length);
         pt3_trj_filtered = [];
         pt3_trj.forEach((i) => {
             if(i.trj.length <= trj_filter){

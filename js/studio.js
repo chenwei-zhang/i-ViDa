@@ -43,7 +43,6 @@ class Studio {
 
     renderVis() {
         let vis = this;
-        console.log(vis.trajectory)
         var trjBtn = vis.chart.append('g')
             .attr('class', 'trj-btn')
             .selectAll('.trjbtn-rect')
@@ -60,15 +59,17 @@ class Studio {
             .attr('y', (d) => vis.yScale(d.id))
             .attr('width', vis.width)
             .attr('height', 20)
-            .attr('fill', 'green')
-            .attr('stroke', 'white')
-            .on('click', (event, d) => {console.log(d)})
+            .attr('fill', 'white')
+            .attr('stroke', 'black')
+            .attr('cursor', 'pointer');
         d3.selectAll('.trjbtn-group')
             .append('text')
             .attr('x', (d) => 15)
             .attr('y', (d) => vis.yScale(d.id)+10)
             .attr("dy", ".35em")
             .text((d) => {return "Trajectory "+d.id})
-            .attr('font-size', 15);
+            .attr('font-size', 15)
+            .attr('cursor', 'pointer');
+        d3.selectAll('.trjbtn-group').on('click', (event, d) => {console.log(d)})
     }
 }
