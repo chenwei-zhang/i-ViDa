@@ -140,6 +140,8 @@ class Overview {
         vis.states.forEach((dna) => {
             vis.drawNode(dna);
         });
+        vis.drawNode(vis.states[vis.iID]);
+        vis.drawNode(vis.states[vis.fID]);
 
     }
 
@@ -147,11 +149,21 @@ class Overview {
         let vis = this;
         var cx = vis.xScale(dna.pca_x);
         var cy = vis.yScale(dna.pca_y);
-        var cr = vis.rScale(dna.time);
+        var cr = 0;
+        if(dna.id != vis.iID && dna.id != vis.fID)
+            cr = vis.rScale(dna.time);
+        else
+            cr = 20;
         vis.context.beginPath();
         vis.context.arc(cx, cy, cr, 0, 2*Math.PI);
-        const cf = d3.rgb(d3.interpolatePlasma(vis.cScale(dna.energy)));
-        cf.opacity = 0.8;
+        var cf = null;
+        if(dna.id != vis.iID && dna.id != vis.fID){
+            cf = d3.rgb(d3.interpolatePlasma(vis.cScale(dna.energy)));
+            cf.opacity = 0.8;
+        }else{
+            cf = d3.rgb('green');
+            cf.opacity = 1.0;
+        }
         vis.context.fillStyle = cf;
         vis.context.fill();
         vis.context.strokeStyle = 'white';
