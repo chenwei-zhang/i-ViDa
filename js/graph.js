@@ -42,7 +42,7 @@ class DNAGraph {
             .domain([d3.min(vis.states, (d)=> d.time), d3.max(vis.states, (d)=> d.time)])
             .range([0, 1]);
         
-            // svg of the vis
+        // svg of the vis
         vis.svg = d3.select(vis.config.parentElement)
             .append('svg')
             .attr('id', 'scatter-svg')
