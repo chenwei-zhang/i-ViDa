@@ -4,44 +4,76 @@ body {
 .header {
     height: 50px;
 }
-.row {
+.container {
+    width: 2000px;
     display: flex;
     flex-direction: row;
     margin: 0 auto;
 }
 
 .vis1 {
+    width: 1000px;
     display: flex;
     flex-direction: row;
 }
 
+#overview-canvas-nodes {
+    position: absolute;
+    z-index: 2;
+}
+
+#overview-canvas-sel {
+    position: absolute;
+    z-index: 3;
+}
+
+#overview-canvas-trj {
+    position: absolute;
+    z-index: 3;
+}
+
+#overview-svg {
+    position: absolute;
+    z-index: 1;
+}
+
+#overview-overlay {
+    position: absolute;
+    z-index: 4;
+}
+
 #scatter {
     padding: 30px;
-    height: 900px;
+    height: 700px;
 }
 .tick {
     stroke-opacity: 0.5;
     stroke-dasharray: 2,2;
     fill: grey;
 }
+.menu {
+    width: 200px;
+}
+#navigate {
+    height: 200px;
+}
 #trajectory {
-    width: 100px;
-    height: 900px;
-    background-color: gainsboro;
+    height: 500px;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .vis2 {
     display: flex;
     flex-direction: column;
-    background-color:antiquewhite;
 }
 #structure {
     width: 300px;
-    height: 540px;
+    height: 500px;
     background-color: salmon;
 }
 #bar {
     width: 300px;
-    height: 360px;
+    height: 200px;
     background-color:cadetblue;
 }
