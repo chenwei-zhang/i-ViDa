@@ -18,6 +18,7 @@
 *.npy
 *.npz
 *.pickle
+*.json
 
 lightning_logs
 # Byte-compiled / optimized / DLL files
