@@ -15,7 +15,7 @@ body {
 .vis1 {
     width: 1000px;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     background-color: #fff;
 }
 
@@ -46,7 +46,7 @@ body {
 }
 
 #scatter {
-    padding: 30px;
+    transform: translate(0px, 800px);
 }
 .tick {
     stroke-opacity: 0.5;

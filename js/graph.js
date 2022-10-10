@@ -60,7 +60,7 @@ class DNAGraph {
             .attr('height', vis.height)
             .attr('fill', '#e5ecf6')
             .attr('opacity', 0.6)
-            attr('clip-path', 'url(#clip)');
+            .attr('clip-path', 'url(#clip)');
         
         // axis group
         vis.xAxis = d3.axisBottom(vis.xScale).tickSize(-vis.height);

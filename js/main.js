@@ -3,7 +3,7 @@ let pt3_dna,
     pt3_dna_filtered,
     pt3_trj_filtered;
 
-let trj_filter = 200;
+let trj_filter = 2000;
 
 let overview, studio;
 const dispatcher = d3.dispatch('selTrj');
@@ -47,7 +47,7 @@ d3.json('data/PT3_dna.json').then((data) => {
         //pt3_trj = pt3_trj.sort((a,b) => a.trj.length - b.trj.length);
         pt3_trj_filtered = [];
         pt3_trj.forEach((i) => {
-            if(i.trj.length >= trj_filter){
+            if(i.trj.length <= trj_filter){
                 pt3_trj_filtered.push(i);
             }
         })
@@ -86,11 +86,11 @@ d3.json('data/PT3_dna.json').then((data) => {
         //     {
         //         parentElement: '#scatter',
         //         width: 1000,
-        //         height: 800,
+        //         height: 700,
         //         margin: {left: 30, right: 20, top: 20, bottom: 20},
         //     },
         //     pt3_dna_filtered,
-        //     [pt3_trj_filtered[0], pt3_trj_filtered[1], pt3_trj_filtered[2]],
+        //     [pt3_trj_filtered[0]],
         // );
         // graph.updateVis();
         // d3.selectAll('.particle').each(moveParticles1);

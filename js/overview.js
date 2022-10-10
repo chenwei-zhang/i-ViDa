@@ -37,7 +37,11 @@ class Overview {
         // size scale
         vis.rScale = d3.scaleSqrt()
             .domain([d3.min(vis.states, (d)=> d.time), d3.max(vis.states, (d)=> d.time)])
-            .range([5, 20]);
+            .range([2, 15]);
+        // opacity scale
+        vis.oScale = d3.scalePow().exponent(0.3)
+            .domain([150, 150000])
+            .range([1, 0.4]);
 
         // selection trj category
         vis.sScale = d3.scaleOrdinal(d3.schemeDark2);
@@ -152,7 +156,12 @@ class Overview {
         let vis = this;
         var cx = vis.xScale(dna.pca_x);
         var cy = vis.yScale(dna.pca_y);
-        var cr = vis.rScale(dna.time);
+        var cr = null;
+        if(dna.id != vis.iID && dna.id != vis.fID){
+            cr = vis.rScale(dna.time);
+        }else{
+            cr = 15;
+        }
         vis.context.beginPath();
         vis.context.arc(cx, cy, cr, 0, 2*Math.PI);
         var cf = null;
@@ -186,8 +195,8 @@ class Overview {
         let vis = this;
         var pos = [];
         trj.trj.forEach((i, idx) => {
-            if(trj.trj.length >= 50000){
-                if(idx % 5 == 0)
+            if(trj.trj.length >= 10000){
+                if(idx % 10 == 0)
                     pos.push({x: i.pca_x, y: i.pca_y});
             }else{
                 pos.push({x: i.pca_x, y: i.pca_y});
@@ -200,7 +209,9 @@ class Overview {
         gen.context(vis.contextTrj);
         vis.contextTrj.beginPath();
         gen(pos);
-        vis.contextTrj.strokeStyle = vis.sScale(idx);
+        var cf = d3.rgb(vis.sScale(idx));
+        cf.opacity = vis.oScale(trj.trj.length);
+        vis.contextTrj.strokeStyle = cf;
         vis.contextTrj.lineWidth = 2;
         vis.contextTrj.stroke();
     }
