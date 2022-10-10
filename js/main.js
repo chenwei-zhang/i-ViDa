@@ -5,9 +5,9 @@ let pt3_dna,
 
 let trj_filter = 200;
 
-let graph;
+let overview, studio;
+const dispatcher = d3.dispatch('selTrj');
 
-var start = new Date().getTime();
 /**
  * Load PT3 DNA data
  */
@@ -44,10 +44,10 @@ d3.json('data/PT3_dna.json').then((data) => {
             };
             pt3_trj.push(trj_data);
         });
-        pt3_trj = pt3_trj.sort((a,b) => a.trj.length - b.trj.length);
+        //pt3_trj = pt3_trj.sort((a,b) => a.trj.length - b.trj.length);
         pt3_trj_filtered = [];
         pt3_trj.forEach((i) => {
-            if(i.trj.length <= trj_filter){
+            if(i.trj.length >= trj_filter){
                 pt3_trj_filtered.push(i);
             }
         })
@@ -72,12 +72,14 @@ d3.json('data/PT3_dna.json').then((data) => {
         overview.updateVis();
         studio = new Studio(
             {
-                parentElement: '#trajectory',
-                width: 200,
-                height: 500,
-                margin: {left: 5, right: 20, top: 5, bottom: 0},
+                parentElement: '#trajectory-clip',
+                width: 500,
+                height: 2800,
+                margin: {left: 30, right: 20, top: 0, bottom: 0},
+                callToolTip: callToolTip1,
             },
             pt3_trj,
+            dispatcher,
         );
         studio.updateVis();
         // graph = new DNAGraph(
@@ -119,3 +121,22 @@ d3.json('data/PT3_dna.json').then((data) => {
     })
 });
 
+dispatcher.on('selTrj', (selectedTrj) => {
+    overview.seltrj = selectedTrj;
+    overview.drawTrajectory();
+})
+
+const callToolTip1 = function(e, d, vis) {
+    d3.select("#tooltip1").style("display", "inline-block").style("opacity", 1);
+    d3.select("#tooltip1")
+        .html(
+            `
+            <div>${d.id}</div>
+            <div>
+                <p><text>Steps: ${d.trj.length}</text></p>
+            </div>
+            `
+        )
+        .style('left', e.pageX+'px')
+        .style('top', e.pageY+'px');
+};

@@ -59,7 +59,8 @@ class DNAGraph {
             .attr('width', vis.width)
             .attr('height', vis.height)
             .attr('fill', '#e5ecf6')
-            .attr('opacity', 0.6);
+            .attr('opacity', 0.6)
+            attr('clip-path', 'url(#clip)');
         
         // axis group
         vis.xAxis = d3.axisBottom(vis.xScale).tickSize(-vis.height);
@@ -76,10 +77,9 @@ class DNAGraph {
             .attr('id', 'clip')
             .append('SVG:rect')
             .attr('width', vis.width)
-            .attr('height', vis.height)
+            .attr('height', 700)
             .attr('x', 0)
             .attr('y', 0);
-
         // brush
         vis.brush = d3.brush()
             .extent([[0,0], [vis.width,vis.height]])
@@ -189,30 +189,30 @@ class DNAGraph {
         var paths = vis.chart.append('g').attr('class', 'path-container').attr('clip-path', 'url(#clip)')
                 .selectAll('.trj')
                 .data(vis.trajectory, (d) => d.id);
-            var pathsEnter = paths
-                .enter().append('g')
-                .attr('class', 'path-group')
-                .append('path')
-                .attr('class', 'trj')
-                .attr('id', (d) => d.id);
-            // paths encoding trj info
-            pathsEnter.merge(paths)
-                .attr('d', (d) => {
-                    const indices = d.trj;
-                    var pos = [];
-                    indices.forEach((i, idx) => {
-                        pos.push({x: i.pca_x, y: i.pca_y});
-                    })
-                    var gen = d3.line()
-                        .x((d) => vis.xScale(d.x))
-                        .y((d) => vis.yScale(d.y))
-                        .curve(d3.curveLinear);
-                    return gen(pos);
-                }).attr('fill', 'none')
-                .attr('stroke', (d) => {const color = ['green', 'blue']; return d.id==57? color[0]:color[1];})
-                .attr('stroke-width', 2)
-                .attr('opacity', 0.1)
-                //.attr('display', 'none');
+        var pathsEnter = paths
+            .enter().append('g')
+            .attr('class', 'path-group')
+            .append('path')
+            .attr('class', 'trj')
+            .attr('id', (d) => d.id);
+        // paths encoding trj info
+        pathsEnter.merge(paths)
+            .attr('d', (d) => {
+                const indices = d.trj;
+                var pos = [];
+                indices.forEach((i, idx) => {
+                    pos.push({x: i.pca_x, y: i.pca_y});
+                })
+                var gen = d3.line()
+                    .x((d) => vis.xScale(d.x))
+                    .y((d) => vis.yScale(d.y))
+                    .curve(d3.curveLinear);
+                return gen(pos);
+            }).attr('fill', 'none')
+            .attr('stroke', (d) => {const color = ['green', 'blue']; return d.id==57? color[0]:color[1];})
+            .attr('stroke-width', 2)
+            .attr('opacity', 0.1)
+            //.attr('display', 'none');
     }
 
     idled() {
