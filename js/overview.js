@@ -5,12 +5,12 @@ class Overview {
         this.config = {
             parentElement: _config.parentElement,
             containerWidth: _config.width,
-            containerHeight: _config.height
+            containerHeight: _config.height,
         }
         this.margin = _config.margin;
         this.states = _data_dna;
         this.trajectory = _data_trj;
-        this.seltrj = [1, 2, 3];
+        this.seltrj = [];
         this.seldna = null;
         this.iID = -1;
         this.fID = -1;
@@ -37,7 +37,11 @@ class Overview {
         // size scale
         vis.rScale = d3.scaleSqrt()
             .domain([d3.min(vis.states, (d)=> d.time), d3.max(vis.states, (d)=> d.time)])
-            .range([5, 20]);
+            .range([2, 15]);
+        // opacity scale
+        vis.oScale = d3.scalePow().exponent(0.3)
+            .domain([150, 150000])
+            .range([1, 0.4]);
 
         // selection trj category
         vis.sScale = d3.scaleOrdinal(d3.schemeDark2);
@@ -48,7 +52,7 @@ class Overview {
             .attr('width', vis.config.containerWidth)
             .attr('height', vis.config.containerHeight)
             .append("g")
-            .attr("transform", `translate(${vis.margin.left}, ${vis.margin.top})`);
+            .attr("transform", `translate(${vis.margin.left}, ${vis.margin.top})`);        
         // canvas-nodes
         vis.canvas = d3.select(vis.config.parentElement)
             .append('canvas')
@@ -91,6 +95,7 @@ class Overview {
             .attr('width', vis.config.containerWidth)
             .attr('height', vis.config.containerHeight)
             .append("g")
+            .attr('id', 'overview-overlay-area')
             .attr("transform", `translate(${vis.margin.left}, ${vis.margin.top})`);
         // brush
         vis.brush = d3.brush()
@@ -109,7 +114,7 @@ class Overview {
             .y((d) => d.pca_y)
         vis.states.forEach((i) => {
             vis.quadTree.add(i)
-        })
+        });
     }
 
     updateVis() {
@@ -124,6 +129,7 @@ class Overview {
         // axis
         vis.xAxisG.call(vis.xAxis);
         vis.yAxisG.call(vis.yAxis);
+        console.log(vis.seltrj);
         // draw nodes
         vis.drawStates();
         // draw trjs
@@ -138,7 +144,8 @@ class Overview {
         vis.context.fillRect(0, 0, vis.width, vis.height);
         // draw all points
         vis.states.forEach((dna) => {
-            vis.drawNode(dna);
+            if(dna.id != vis.iID && dna.id != vis.fID)
+                vis.drawNode(dna);
         });
         vis.drawNode(vis.states[vis.iID]);
         vis.drawNode(vis.states[vis.fID]);
@@ -149,11 +156,12 @@ class Overview {
         let vis = this;
         var cx = vis.xScale(dna.pca_x);
         var cy = vis.yScale(dna.pca_y);
-        var cr = 0;
-        if(dna.id != vis.iID && dna.id != vis.fID)
+        var cr = null;
+        if(dna.id != vis.iID && dna.id != vis.fID){
             cr = vis.rScale(dna.time);
-        else
-            cr = 20;
+        }else{
+            cr = 15;
+        }
         vis.context.beginPath();
         vis.context.arc(cx, cy, cr, 0, 2*Math.PI);
         var cf = null;
@@ -177,7 +185,7 @@ class Overview {
         // draw selected
         vis.seltrj.forEach((id, idx) => {
             if(id >= 1 && id <= 100){
-                const trj = vis.trajectory[id];
+                const trj = vis.trajectory[id-1];
                 vis.drawTrj(trj, idx);
             }
         });
@@ -187,7 +195,12 @@ class Overview {
         let vis = this;
         var pos = [];
         trj.trj.forEach((i, idx) => {
-            pos.push({x: i.pca_x, y: i.pca_y});
+            if(trj.trj.length >= 10000){
+                if(idx % 10 == 0)
+                    pos.push({x: i.pca_x, y: i.pca_y});
+            }else{
+                pos.push({x: i.pca_x, y: i.pca_y});
+            }
         });
         var gen = d3.line()
             .x((d) => vis.xScale(d.x))
@@ -196,7 +209,9 @@ class Overview {
         gen.context(vis.contextTrj);
         vis.contextTrj.beginPath();
         gen(pos);
-        vis.contextTrj.strokeStyle = vis.sScale(idx);
+        var cf = d3.rgb(vis.sScale(idx));
+        cf.opacity = vis.oScale(trj.trj.length);
+        vis.contextTrj.strokeStyle = cf;
         vis.contextTrj.lineWidth = 2;
         vis.contextTrj.stroke();
     }

@@ -8,22 +8,22 @@
     <div class="header">
         <h2>i-ViDa: Visualize DNA Reaction Trajectories</h2>
     </div>
-    <div class="container">
+    <div class="container", id="ctn1">
         <div class="vis1">
             <div id="overview"></div>
             <div id="scatter"></div>
         </div>
         <div class="menu">
-            <div id="navigate"> buttons here</div>
-            <div id="trajectory"></div>
+            <div id="trajectory">
+                <div id="trajectory-clip"></div>
+            </div>
         </div>
+    </div>
+    <div class="container", id="ctn2">
         <div class="vis2">
-            <div id="structure"> DNA Vis Placeholder</div>
-            <div id="bar">Barchart Placeholder</div>
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>    
     <script src="js/d3.v6.min.js"></script>
     <script src="js/main.js"></script>
     <script src="js/overview.js"></script>
