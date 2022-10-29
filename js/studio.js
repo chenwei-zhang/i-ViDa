@@ -11,6 +11,8 @@ class Studio {
         this.dispatcher = _dispatcher;
         this.trajectory = _data_trj;
         this.seltrj = [null, null, null];
+        this.sortby = 'byid';
+        this.ordertime = Array(100);
         this.initVis();
     }
 
@@ -21,7 +23,7 @@ class Studio {
         vis.height = vis.config.containerHeight - vis.margin.top - vis.margin.bottom;
         // xscale
         vis.xScale = d3.scalePow().exponent(0.5)
-            .range([0, vis.width]);
+            .range([0, vis.width-60]);
         // yscale
         vis.yScale = d3.scaleBand()
             .range([0, vis.height]).padding(1);
@@ -40,6 +42,43 @@ class Studio {
             .attr('width', vis.width)
             .attr('height', 700)
             .attr('transform', `translate(${vis.margin.left}, ${vis.margin.top})`);
+        // control area
+        vis.ctrl = d3.select('#trajectory-ctrl')
+            .html(
+                `<div>
+                    <label> Sort by:
+                    <input type='radio' name='sort' value='byid' checked> id
+                    <input type='radio' name='sort' value='bytime'> time
+                </div>`
+            )
+        d3.selectAll('input').on('change', function(e) {
+            vis.sortby = this.value;
+            if(vis.sortby == 'bytime'){
+                d3.selectAll('.trj-bar')
+                    .attr('x1', (d) => vis.xScale(0))
+                    .attr('x2', (d) => {return vis.xScale(d3.sum(d.time));})
+                    .transition().duration(500)
+                    .attr('y2', (d) => vis.yScale(d.ranktime))
+                    .attr('y1', (d) => vis.yScale(d.ranktime));
+                d3.selectAll('.trj-star')
+                    .transition().duration(500)
+                    .attr('transform', (d) => `translate(${0}, ${vis.yScale(d.ranktime)})`);
+                vis.yScale.domain(vis.ordertime);
+                vis.yAxisG.transition().duration(500).call(vis.yAxis);
+            }else if(vis.sortby == 'byid'){
+                vis.yScale.domain(vis.trajectory.map((d) => d.id));
+                d3.selectAll('.trj-bar')
+                    .attr('x1', (d) => vis.xScale(0))
+                    .attr('x2', (d) => {return vis.xScale(d3.sum(d.time));})
+                    .transition().duration(500)
+                    .attr('y2', (d) => vis.yScale(d.id))
+                    .attr('y1', (d) => vis.yScale(d.id))
+                d3.selectAll('.trj-star')
+                    .transition().duration(500)
+                    .attr('transform', (d) => `translate(${0}, ${vis.yScale(d.id)})`);
+                vis.yAxisG.transition().duration(500).call(vis.yAxis);
+            }
+        });
         // clippath
         vis.svg.append('defs').append('SVG:clipPath')
             .attr('id', 'clip')
@@ -54,7 +93,8 @@ class Studio {
             .attr('class', 'axis x-axis')
         vis.yAxisG = vis.chart
             .append('g')
-            .attr('class', 'axis y-axis');
+            .attr('class', 'axis y-axis')
+            .attr('transform', `translate(${40}, 0)`);
         vis.xAxis = d3.axisBottom(vis.xScale);
         vis.yAxis = d3.axisLeft(vis.yScale).tickSizeOuter([0]);
         d3.select('#ctn1').append('div').attr('id', 'tooltip1');
@@ -62,9 +102,11 @@ class Studio {
 
     updateVis() {
         let vis = this;
-        // update scale domain
-        vis.xScale.domain([0, d3.max(vis.trajectory, (d) => d.trj.length)]);
+        vis.xScale.domain([0, d3.max(vis.trajectory, (d)=>(d.totaltime))]);
         vis.yScale.domain(vis.trajectory.map((d) => d.id));
+        vis.trajectory.forEach((trj) => {
+            vis.ordertime[trj.ranktime-1] = trj.id; 
+        });
         vis.renderVis();
     }
 
@@ -82,14 +124,15 @@ class Studio {
             .attr('id', (d) => `trj-bar${d.id}`);
         vis.barsEnter
             .merge(vis.bars)
-            .attr('x1', (d) => {return vis.xScale(d.trj.length);})
-            .attr('x2', (d) => vis.xScale(0))
-            .attr('y1', (d) => vis.yScale(d.id))
-            .attr('y2', (d) => vis.yScale(d.id))
             .attr('stroke', '#668fff')
             .attr('stroke-width', 10)
             .attr('stroke-opacity', 0.6)
-            .on('mousemove', function(e, d) {
+            .attr('transform', `translate(${40}, 0)`)
+            .attr('x1', (d) => vis.xScale(0))
+            .attr('y2', (d) => vis.yScale(d.id))
+            .attr('y1', (d) => vis.yScale(d.id))
+            .attr('x2', (d) => {return vis.xScale(d.totaltime);});
+        vis.barsEnter.on('mousemove', function(e, d) {
                 d3.select(this).transition().duration(200).attr('stroke-opacity', 1);
                 vis.config.callToolTip(e, d, vis);
             }).on('mouseout', function() {
@@ -119,6 +162,9 @@ class Studio {
                     d3.select(this)
                         .attr('stroke-opacity', 1)
                         .attr('stroke', vis.sScale(pos));
+                    d3.select(`#trj-star${d.id}`)
+                        .attr('stroke', vis.sScale(pos))
+                        .attr('stroke-width', 2);
                     vis.seltrj[pos] = d.id;
                     if(numSeltrj == 2){
                         d3.selectAll('.trj-bar').each((d) =>{
@@ -131,6 +177,9 @@ class Studio {
                     d3.select(this)
                         .attr('stroke-opacity', 0.6)
                         .attr('stroke', '#668fff');
+                    d3.select(`#trj-star${d.id}`)
+                        .attr('stroke', '#5a5a5a')
+                        .attr('stroke-width', 0.1);
                     vis.seltrj.forEach((t, idx) => {
                         if(t === d.id){
                             vis.seltrj[idx] = null;
@@ -144,5 +193,18 @@ class Studio {
                 }
                 vis.dispatcher.call('selTrj', e, vis.seltrj);
             });
+        // add symbols
+        vis.stars = vis.chart.selectAll('.trj-star')
+            .data(vis.trajectory, (d) => d.id);
+        vis.starsEnter = vis.stars
+            .enter()
+            .append('path')
+            .attr('d', d3.symbol().type(d3.symbolStar).size(100))
+            .attr('fill', '#ffffff')
+            .attr('stroke', '#5a5a5a')
+            .attr('stroke-width', 0.1)
+            .attr('class', 'trj-star')
+            .attr('id', (d) => `trj-star${d.id}`)
+            .attr('transform', (d) => `translate(${0}, ${vis.yScale(d.id)})`);
     }
 }
