@@ -44,10 +44,14 @@ body {
     position: absolute;
     z-index: 4;
 }
-
-#scatter {
-    transform: translate(0px, 800px);
+#overview-slider {
+    position: absolute;
+    z-index: 5;
 }
+.slider{
+    cursor: grabbing;
+}
+
 .tick {
     stroke-opacity: 0.5;
     stroke-dasharray: 2,2;
@@ -72,6 +76,12 @@ body {
     overflow-x: hidden;
 }
 
+#trajectory-ctrl {
+    position: absolute;
+    width: 0px;
+    transform: translate(0, -640px);
+}
+
 .vis2 {
     display: flex;
     flex-direction: row;
@@ -91,7 +101,7 @@ body {
     position: absolute;
     text-align: center;
     width: 100px;
-    height: 50px;
+    height: 100px;
     padding: 2px;
     font-size: 10px;
     background: seashell;

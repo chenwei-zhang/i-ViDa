@@ -11,9 +11,10 @@ class Overview {
         this.states = _data_dna;
         this.trajectory = _data_trj;
         this.seltrj = [];
-        this.seldna = null;
+        this.seldna = [];
         this.iID = -1;
         this.fID = -1;
+        this.k = 1;
         this.initVis();
     }
 
@@ -56,6 +57,7 @@ class Overview {
         // canvas-nodes
         vis.canvas = d3.select(vis.config.parentElement)
             .append('canvas')
+            .attr('class', 'overview-canvas')
             .attr('id', 'overview-canvas-nodes')
             .attr('width', vis.width)
             .attr('height', vis.height)
@@ -64,6 +66,7 @@ class Overview {
         // canvas-selection
         vis.canvasSel = d3.select(vis.config.parentElement)
             .append('canvas')
+            .attr('class', 'overview-canvas')
             .attr('id', 'overview-canvas-sel')
             .attr('width', vis.width)
             .attr('height', vis.height)
@@ -72,6 +75,7 @@ class Overview {
         // canvas-trj
         vis.canvasTrj = d3.select(vis.config.parentElement)
             .append('canvas')
+            .attr('class', 'overview-canvas')
             .attr('id', 'overview-canvas-trj')
             .attr('width', vis.width)
             .attr('height', vis.height)
@@ -115,6 +119,34 @@ class Overview {
         vis.states.forEach((i) => {
             vis.quadTree.add(i)
         });
+        // slider for density filter
+        vis.filterk = d3.sliderBottom()
+            .min(5).max(50).step(1)
+            .width(200)
+            .height(50)
+            .default(1)
+            .ticks(5)
+            .fill('#668fff')
+            .handle(d3.symbol().type(d3.symbolCircle).size(100))
+            .on('onchange', (v) => {
+                vis.k = v;
+                vis.drawStates();
+                vis.drawTrajectory();
+        });
+        d3.select('body').on('keydown', (e) => {
+            if(e.keyCode == 82){
+                vis.k = 1;
+                vis.drawStates();
+                vis.drawTrajectory();
+            }
+        });
+        vis.filterkG = d3.select(vis.config.parentElement)
+            .append('svg')
+            .attr('id', 'overview-slider')
+            .attr('height', 75)
+            .append('g')
+            .attr('transform', `translate(${vis.margin.left+20}, ${vis.margin.top+20})`)
+            .call(vis.filterk)
     }
 
     updateVis() {
@@ -129,7 +161,6 @@ class Overview {
         // axis
         vis.xAxisG.call(vis.xAxis);
         vis.yAxisG.call(vis.yAxis);
-        console.log(vis.seltrj);
         // draw nodes
         vis.drawStates();
         // draw trjs
@@ -143,13 +174,12 @@ class Overview {
         vis.context.fillStyle = 'rgba(229, 236, 246, 0.3)';
         vis.context.fillRect(0, 0, vis.width, vis.height);
         // draw all points
-        vis.states.forEach((dna) => {
+        vis.states.filter((s) => s.density.size >= vis.k).forEach((dna) => {
             if(dna.id != vis.iID && dna.id != vis.fID)
                 vis.drawNode(dna);
         });
         vis.drawNode(vis.states[vis.iID]);
         vis.drawNode(vis.states[vis.fID]);
-
     }
 
     drawNode(dna) {
@@ -162,6 +192,8 @@ class Overview {
         }else{
             cr = 15;
         }
+        vis.context.strokeStyle = 'white';
+        vis.context.lineWidth = 0.5;
         vis.context.beginPath();
         vis.context.arc(cx, cy, cr, 0, 2*Math.PI);
         var cf = null;
@@ -174,8 +206,6 @@ class Overview {
         }
         vis.context.fillStyle = cf;
         vis.context.fill();
-        vis.context.strokeStyle = 'white';
-        vis.context.lineWidth = 0.5;
         vis.context.stroke();
     }
 
@@ -195,11 +225,14 @@ class Overview {
         let vis = this;
         var pos = [];
         trj.trj.forEach((i, idx) => {
-            if(trj.trj.length >= 10000){
-                if(idx % 10 == 0)
-                    pos.push({x: i.pca_x, y: i.pca_y});
+            if(trj.trj.length >= 3000){
+                if(idx % Math.floor(trj.trj.length/3000) == 0 || (idx <= trj.trj.length-1&&idx >= trj.trj.length-20)){
+                    if(i.density.size > vis.k)
+                        pos.push({x: i.pca_x, y: i.pca_y});
+                }
             }else{
-                pos.push({x: i.pca_x, y: i.pca_y});
+                if(i.density.size > vis.k)
+                    pos.push({x: i.pca_x, y: i.pca_y});
             }
         });
         var gen = d3.line()
@@ -250,33 +283,40 @@ class Overview {
         var dY = vis.yScale(closest.pca_y);
         var dist = Math.sqrt(((mouse[0]-dX)**2+(mouse[1]-dY)**2));
         if(dist < vis.rScale(closest.time)){
-            if(!vis.seldna || (vis.seldna && vis.seldna.id != closest.id)){
-                vis.seldna = closest;
-                vis.drawSelection(closest);
+            if(vis.seldna.lenngth == 0 || (!vis.seldna.includes(closest))){
+                vis.seldna.push(closest);
+                console.log(vis.seldna);
+                vis.drawSelection(vis.seldna);
             }else{
-                vis.contextSel.clearRect(0, 0, vis.width, vis.height);
+                vis.seldna = vis.seldna.filter((v) => {return v.id != closest.id});
+                console.log(vis.seldna);
+                vis.drawSelection(vis.seldna);
             }
         }else{
-            vis.seldna = null;
+            vis.seldna = [];
             vis.contextSel.clearRect(0, 0, vis.width, vis.height);
         }
     }
 
     drawSelection(sel) {
-        if(!sel) return;
         let vis = this;
-        console.log(sel);
+        if(sel.length == 0) {
+            vis.contextSel.clearRect(0, 0, vis.width, vis.height);
+            return;
+        }
         vis.contextSel.clearRect(0, 0, vis.width, vis.height);
         vis.contextSel.fillStyle = 'rgba(255, 0, 0, 1)';
-        var cx = vis.xScale(sel.pca_x);
-        var cy = vis.yScale(sel.pca_y);
-        var cr = vis.rScale(sel.time);
-        vis.contextSel.beginPath();
-        vis.contextSel.arc(cx, cy, cr, 0, 2*Math.PI);
-        vis.contextSel.fill();
-        vis.contextSel.strokeStyle = 'white';
-        vis.contextSel.lineWidth = 1;
-        vis.contextSel.stroke();
+        sel.forEach((s) => {
+            var cx = vis.xScale(s.pca_x);
+            var cy = vis.yScale(s.pca_y);
+            var cr = vis.rScale(s.time);
+            vis.contextSel.beginPath();
+            vis.contextSel.arc(cx, cy, cr, 0, 2*Math.PI);
+            vis.contextSel.fill();
+            vis.contextSel.strokeStyle = 'white';
+            vis.contextSel.lineWidth = 1;
+            vis.contextSel.stroke();
+        });
     }
 
 }

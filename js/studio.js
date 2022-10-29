@@ -40,6 +40,20 @@ class Studio {
             .attr('width', vis.width)
             .attr('height', 700)
             .attr('transform', `translate(${vis.margin.left}, ${vis.margin.top})`);
+        // control area
+        vis.ctrl = d3.select('#trajectory-ctrl')
+            .append('svg')
+            .attr('width', 250)
+            .attr('height', 200)
+            .attr('id', 'ctrl-area')
+            .attr('transform', `translate(${vis.width+vis.margin.left-vis.width/2}, ${vis.margin.top})`)
+            .append('rect')
+            .attr('width', vis.width/2)
+            .attr('height', 200)
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('fill', 'grey')
+            .attr('opacity', 0);
         // clippath
         vis.svg.append('defs').append('SVG:clipPath')
             .attr('id', 'clip')
@@ -63,7 +77,8 @@ class Studio {
     updateVis() {
         let vis = this;
         // update scale domain
-        vis.xScale.domain([0, d3.max(vis.trajectory, (d) => d.trj.length)]);
+        vis.xScale.domain([0, d3.max(vis.trajectory, (d)=>(d3.sum(d.time)))]);
+        //vis.xScale.domain([0, d3.max(vis.trajectory, (d) => d.trj.length)]);
         vis.yScale.domain(vis.trajectory.map((d) => d.id));
         vis.renderVis();
     }
@@ -82,7 +97,7 @@ class Studio {
             .attr('id', (d) => `trj-bar${d.id}`);
         vis.barsEnter
             .merge(vis.bars)
-            .attr('x1', (d) => {return vis.xScale(d.trj.length);})
+            .attr('x1', (d) => {return vis.xScale(d3.sum(d.time));})
             .attr('x2', (d) => vis.xScale(0))
             .attr('y1', (d) => vis.yScale(d.id))
             .attr('y2', (d) => vis.yScale(d.id))
