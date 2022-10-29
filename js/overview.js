@@ -6,6 +6,7 @@ class Overview {
             parentElement: _config.parentElement,
             containerWidth: _config.width,
             containerHeight: _config.height,
+            callToolTip: _config.callToolTip,
         }
         this.margin = _config.margin;
         this.states = _data_dna;
@@ -20,6 +21,8 @@ class Overview {
 
     initVis() {
         let vis = this;
+        vis.iID = vis.trajectory[0].trj[0].id;
+        vis.fID = vis.trajectory[0].trj[vis.trajectory[0].trj.length-1].id;
         // area
         vis.width = vis.config.containerWidth - vis.margin.left - vis.margin.right;
         vis.height = vis.config.containerHeight - vis.margin.top - vis.margin.bottom;
@@ -146,13 +149,14 @@ class Overview {
             .attr('height', 75)
             .append('g')
             .attr('transform', `translate(${vis.margin.left+20}, ${vis.margin.top+20})`)
-            .call(vis.filterk)
+            .call(vis.filterk);
+        // add tooltip
+        d3.select(vis.config.parentElement).append('div').attr('id', 'tooltip2');
+        vis.config.callToolTip(null, vis.states[vis.iID], vis);
     }
 
     updateVis() {
         let vis = this;
-        vis.iID = vis.trajectory[0].trj[0].id;
-        vis.fID = vis.trajectory[0].trj[vis.trajectory[0].trj.length-1].id;
         vis.renderVis();
     }
 
@@ -282,20 +286,21 @@ class Overview {
         var dX = vis.xScale(closest.pca_x);
         var dY = vis.yScale(closest.pca_y);
         var dist = Math.sqrt(((mouse[0]-dX)**2+(mouse[1]-dY)**2));
-        if(dist < vis.rScale(closest.time)){
+        if(dist < vis.rScale(closest.time) || ((closest.id==vis.fID||closest.id==vis.iID) && (dist < 15))){
             if(vis.seldna.lenngth == 0 || (!vis.seldna.includes(closest))){
                 vis.seldna.push(closest);
-                console.log(vis.seldna);
                 vis.drawSelection(vis.seldna);
             }else{
                 vis.seldna = vis.seldna.filter((v) => {return v.id != closest.id});
-                console.log(vis.seldna);
                 vis.drawSelection(vis.seldna);
             }
         }else{
             vis.seldna = [];
             vis.contextSel.clearRect(0, 0, vis.width, vis.height);
+            d3.selectAll(`.trj-star`).attr('fill', '#ffffff');
         }
+        var tooltipdna = vis.seldna.length==0? vis.states[vis.iID]:vis.seldna[vis.seldna.length-1];
+        vis.config.callToolTip(event, tooltipdna, vis);
     }
 
     drawSelection(sel) {
@@ -305,17 +310,25 @@ class Overview {
             return;
         }
         vis.contextSel.clearRect(0, 0, vis.width, vis.height);
-        vis.contextSel.fillStyle = 'rgba(255, 0, 0, 1)';
-        sel.forEach((s) => {
+        vis.contextSel.fillStyle = d3.rgb('#d03830');
+        d3.selectAll(`.trj-star`).attr('fill', '#ffffff');
+        sel.forEach((s, i) => {
             var cx = vis.xScale(s.pca_x);
             var cy = vis.yScale(s.pca_y);
-            var cr = vis.rScale(s.time);
+            var cr = (s.id == vis.iID||s.id == vis.fID)? 15:vis.rScale(s.time);
             vis.contextSel.beginPath();
             vis.contextSel.arc(cx, cy, cr, 0, 2*Math.PI);
             vis.contextSel.fill();
             vis.contextSel.strokeStyle = 'white';
             vis.contextSel.lineWidth = 1;
             vis.contextSel.stroke();
+            s.density.forEach((t) => {
+                if(i == sel.length-1){
+                    d3.select(`#trj-star${t}`).attr('fill', '#d03830');
+                }else{
+                    d3.select(`#trj-star${t}`).attr('fill', '#f7d58f');
+                }
+            })
         });
     }
 

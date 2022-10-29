@@ -34,15 +34,22 @@ d3.json('data/PT4_dna.json').then((data) => {
             const idx = [];
             trj.idx.forEach((i) => {
                 idx.push(pt3_dna[i]);
-                pt3_dna[i].density.add(index);
+                pt3_dna[i].density.add(index+1);
             });
             const trj_data = {
                 id: trj.ID,
                 trj: idx,
-                time: trj.time
+                time: trj.time,
+                totaltime: d3.sum(trj.time),
             };
             pt3_trj.push(trj_data);
         });
+        pt3_sorttime = pt3_trj.slice().sort((a, b) => (a.totaltime - b.totaltime));
+        pt3_ranktime = pt3_trj.map((x)=> pt3_sorttime.indexOf(x)+1);
+        pt3_trj.forEach((trj, index) => {
+            trj.ranktime = pt3_ranktime[index];
+        })
+        console.log(pt3_trj);
     }).then(() => {
         overview = new Overview(
             {
@@ -50,6 +57,7 @@ d3.json('data/PT4_dna.json').then((data) => {
                 width: 900,
                 height: 700,
                 margin: {left: 30, right: 20, top: 20, bottom: 20},
+                callToolTip: callToolTip2,
             },
             pt3_dna,
             pt3_trj,
@@ -90,4 +98,18 @@ const callToolTip1 = function(e, d, vis) {
         )
         .style('left', e.pageX+'px')
         .style('top', e.pageY+'px');
+};
+
+const callToolTip2 = function(e, d, vis) {
+    d3.select("#tooltip2")
+        .html(
+            `
+            <div style='font-size:10px'>
+                <br> DP: ${d.dp}<br>
+                <br> Energy: ${d.energy}<br>
+                <br> Time: ${d.time}<br>
+                <br> Density: ${d.density.size} ${d.density.size<=5? '['+[...d.density].join(' ')+']':''}<br>
+            </div>
+            `
+        );
 };
