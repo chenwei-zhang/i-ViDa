@@ -41,7 +41,7 @@ class Overview {
         // size scale
         vis.rScale = d3.scaleSqrt()
             .domain([d3.min(vis.states, (d)=> d.time), d3.max(vis.states, (d)=> d.time)])
-            .range([2, 15]);
+            .range([4, 15]);
         // opacity scale
         vis.oScale = d3.scalePow().exponent(0.3)
             .domain([150, 150000])
@@ -114,7 +114,7 @@ class Overview {
         vis.overlay.append('g')
             .attr('class', 'brush')
             .call(vis.brush)
-        vis.overlay.on('click', (event) => {vis.displayTooltipStates(event)});
+        vis.overlay.on('click', (event) => {console.log(event); vis.displayTooltipStates(event)});
         // quadtree
         vis.quadTree = d3.quadtree()
             .x((d) => d.pca_x)
@@ -125,10 +125,10 @@ class Overview {
         // slider for density filter
         vis.filterk = d3.sliderBottom()
             .min(5).max(50).step(1)
-            .width(200)
-            .height(50)
-            .default(1)
-            .ticks(5)
+            .width(300)
+            .tickPadding(-10)
+            .default(5)
+            .ticks(10)
             .fill('#668fff')
             .handle(d3.symbol().type(d3.symbolCircle).size(100))
             .on('onchange', (v) => {
@@ -146,10 +146,12 @@ class Overview {
         vis.filterkG = d3.select(vis.config.parentElement)
             .append('svg')
             .attr('id', 'overview-slider')
+            .attr('width', 400)
             .attr('height', 75)
             .append('g')
             .attr('transform', `translate(${vis.margin.left+20}, ${vis.margin.top+20})`)
             .call(vis.filterk);
+        d3.selectAll('.parameter-value').attr('font-family', 'American Typewriter').attr('fill', '#5a5a5a');
         // add tooltip
         d3.select(vis.config.parentElement).append('div').attr('id', 'tooltip2');
         vis.config.callToolTip(null, vis.states[vis.iID], vis);
@@ -202,8 +204,8 @@ class Overview {
         vis.context.arc(cx, cy, cr, 0, 2*Math.PI);
         var cf = null;
         if(dna.id != vis.iID && dna.id != vis.fID){
-            cf = d3.rgb(d3.interpolatePlasma(vis.cScale(dna.energy)));
-            cf.opacity = 0.8;
+            cf = d3.rgb(d3.interpolateRainbow(vis.cScale(dna.energy)));
+            cf.opacity = 0.6;
         }else{
             cf = d3.rgb('green');
             cf.opacity = 1.0;
@@ -259,6 +261,7 @@ class Overview {
     }
 
     updateChart(event) {
+        console.log(event);
         let vis = this;
         let extent = event.selection;
         if(!extent){
@@ -271,8 +274,8 @@ class Overview {
             vis.overlay.select(".brush").call(vis.brush.move, null);
         }
         vis.drawTrajectory();
-        vis.drawSelection(vis.seldna);
         vis.drawStates();
+        vis.drawSelection(vis.seldna);
         vis.xAxisG.call(d3.axisBottom(vis.xScale).tickSize(-vis.height));
         vis.yAxisG.call(d3.axisLeft(vis.yScale).tickSize(-vis.width));
     }
@@ -286,7 +289,8 @@ class Overview {
         var dX = vis.xScale(closest.pca_x);
         var dY = vis.yScale(closest.pca_y);
         var dist = Math.sqrt(((mouse[0]-dX)**2+(mouse[1]-dY)**2));
-        if(dist < vis.rScale(closest.time) || ((closest.id==vis.fID||closest.id==vis.iID) && (dist < 15))){
+        if((dist < vis.rScale(closest.time)+10 && closest.density.size >= vis.k) 
+        || ((closest.id==vis.fID||closest.id==vis.iID) && (dist < 15))){
             if(vis.seldna.lenngth == 0 || (!vis.seldna.includes(closest))){
                 vis.seldna.push(closest);
                 vis.drawSelection(vis.seldna);
