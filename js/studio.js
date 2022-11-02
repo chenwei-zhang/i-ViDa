@@ -79,14 +79,6 @@ class Studio {
                 vis.yAxisG.transition().duration(500).call(vis.yAxis);
             }
         });
-        // clippath
-        vis.svg.append('defs').append('SVG:clipPath')
-            .attr('id', 'clip')
-            .append('SVG:rect')
-            .attr('width', vis.width)
-            .attr('height', vis.height)
-            .attr('x', 0)
-            .attr('y', 0);
         // axis group
         vis.xAxisG = vis.chart
             .append('g')

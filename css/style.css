@@ -19,40 +19,45 @@ body {
     background-color: #fff;
 }
 
-#overview-canvas-nodes {
-    position: absolute;
-    z-index: 2;
-    shape-rendering: optimizeSpeed;
-}
-
-#overview-canvas-sel {
-    position: absolute;
-    z-index: 3;
-}
-
-#overview-canvas-trj {
-    position: absolute;
-    z-index: 3;
-}
-
 #overview-svg {
     position: absolute;
     z-index: 1;
 }
 
-#overview-overlay {
-    position: absolute;
-    z-index: 5;
-}
-
-#overview-canvas-hull {
+#overview-canvas-bg {
     position: absolute;
     z-index: 1;
 }
 
+#overview-canvas-hull {
+    position: absolute;
+    z-index: 2;
+}
+
 #overview-canvas-vor {
     position: absolute;
+    z-index: 3;
+}
+
+#overview-canvas-nodes {
+    position: absolute;
+    z-index: 3;
+    shape-rendering: optimizeSpeed;
+}
+
+#overview-canvas-sel {
+    position: absolute;
     z-index: 4;
+}
+
+#overview-canvas-trj {
+    position: absolute;
+    z-index: 4;
+}
+
+#overview-overlay {
+    position: absolute;
+    z-index: 5;
 }
 
 #overview-slider {
@@ -93,9 +98,10 @@ body {
 }
 
 .vis2 {
-    width: 700px;
+    width: 1500px;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    background-color: #fff;
 }
 
 
@@ -112,7 +118,7 @@ body {
     position: absolute;
     text-align: center;
     width: 100px;
-    height: 100px;
+    height: 70px;
     padding: 2px;
     font-size: 10px;
     background: seashell;

@@ -74,12 +74,33 @@ d3.json('data/PT4_dna.json').then((data) => {
             dispatcher,
         );
         studio.updateVis();
+        flow = new Flow(
+            {
+                parentElement: '#flow',
+                width: 900,
+                height: 500,
+                margin: {left: 30, right: 20, top: 20, bottom: 20},
+            },
+            pt3_trj,
+        );
+        flow.updateVis();
     })
 });
 
 dispatcher.on('selTrj', (selectedTrj) => {
     overview.seltrj = selectedTrj;
     overview.drawTrajectory();
+    d3.selectAll('.flow-line').remove().exit();
+    flow.seltrj = selectedTrj;
+    console.log(selectedTrj)
+    if(selectedTrj.every(e => e===null)){
+        flow.seltrj = [88,97,24];
+        flow.flag = 0;
+        flow.drawAllFlow(flow.flag, null);
+    }else{
+        flow.flag = 1;
+        flow.drawAllFlow(flow.flag, null);
+    }
 })
 
 const callToolTip1 = function(e, d, vis) {

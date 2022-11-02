@@ -58,7 +58,16 @@ class Overview {
             .attr('width', vis.config.containerWidth)
             .attr('height', vis.config.containerHeight)
             .append("g")
-            .attr("transform", `translate(${vis.margin.left}, ${vis.margin.top})`);        
+            .attr("transform", `translate(${vis.margin.left}, ${vis.margin.top})`);   
+        // canvas-selection
+        vis.canvasBg = d3.select(vis.config.parentElement)
+            .append('canvas')
+            .attr('class', 'overview-canvas')
+            .attr('id', 'overview-canvas-bg')
+            .attr('width', vis.width)
+            .attr('height', vis.height)
+            .style('transform', `translate(${vis.margin.left}px, ${vis.margin.top}px)`);
+        vis.contextBg = vis.canvasBg.node().getContext('2d');     
         // canvas-nodes
         vis.canvas = d3.select(vis.config.parentElement)
             .append('canvas')
@@ -186,6 +195,9 @@ class Overview {
         // axis
         vis.xAxisG.call(vis.xAxis);
         vis.yAxisG.call(vis.yAxis);
+        // draw background
+        vis.contextBg.fillStyle = 'rgba(229, 236, 246, 0.3)';
+        vis.contextBg.fillRect(0, 0, vis.width, vis.height);
         // draw hull
         vis.drawRegion();
         // draw Voronoi
@@ -249,9 +261,6 @@ class Overview {
     drawStates() {
         let vis = this;
         vis.context.clearRect(0, 0, vis.width, vis.height);
-        // draw background
-        vis.context.fillStyle = 'rgba(229, 236, 246, 0.3)';
-        vis.context.fillRect(0, 0, vis.width, vis.height);
         // draw all points
         vis.states.filter((s) => s.density.size >= vis.k).forEach((dna) => {
             if(dna.id != vis.iID && dna.id != vis.fID)
@@ -304,8 +313,8 @@ class Overview {
         let vis = this;
         var pos = [];
         trj.trj.forEach((i, idx) => {
-            if(trj.trj.length >= 3000){
-                if(idx % Math.floor(trj.trj.length/3000) == 0 || (idx <= trj.trj.length-1&&idx >= trj.trj.length-20)){
+            if(trj.trj.length >= 300){
+                if(idx % Math.floor(trj.trj.length/300) == 0 || (idx <= trj.trj.length-1&&idx >= trj.trj.length-10)){
                     if(i.density.size > vis.k)
                         pos.push({x: i.pca_x, y: i.pca_y});
                 }
