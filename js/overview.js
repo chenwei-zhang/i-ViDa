@@ -8,6 +8,8 @@ class Overview {
             containerHeight: _config.height,
             callToolTip: _config.callToolTip,
         }
+        this.hull = [39719, 22692, 7835,7837, 15452, 10138, 19971,
+                     17896, 29072, 11060, 5027, 289, 288, 290, 15131, 19245, 39719];
         this.margin = _config.margin;
         this.states = _data_dna;
         this.trajectory = _data_trj;
@@ -84,6 +86,24 @@ class Overview {
             .attr('height', vis.height)
             .style('transform', `translate(${vis.margin.left}px, ${vis.margin.top}px)`);
         vis.contextTrj = vis.canvasTrj.node().getContext('2d');
+        // canvas-region
+        vis.canvasRegion = d3.select(vis.config.parentElement)
+            .append('canvas')
+            .attr('class', 'overview-canvas')
+            .attr('id', 'overview-canvas-hull')
+            .attr('width', vis.width)
+            .attr('height', vis.height)
+            .style('transform', `translate(${vis.margin.left}px, ${vis.margin.top}px)`);
+        vis.contextRegion = vis.canvasRegion.node().getContext('2d');
+        // canvas-Voronoi
+        vis.canvasVor = d3.select(vis.config.parentElement)
+            .append('canvas')
+            .attr('class', 'overview-canvas')
+            .attr('id', 'overview-canvas-vor')
+            .attr('width', vis.width)
+            .attr('height', vis.height)
+            .style('transform', `translate(${vis.margin.left}px, ${vis.margin.top}px)`);
+        vis.contextVor = vis.canvasVor.node().getContext('2d');
         // axis group
         vis.xAxis = d3.axisBottom(vis.xScale).tickSize(-vis.height);
         vis.yAxis = d3.axisLeft(vis.yScale).tickSize(-vis.width);
@@ -94,7 +114,6 @@ class Overview {
         vis.yAxisG = vis.svg
             .append('g')
             .attr('class', 'axis y-axis');
-        
         // overlay
         vis.overlay = d3.select(vis.config.parentElement)
             .append('svg')
@@ -114,7 +133,7 @@ class Overview {
         vis.overlay.append('g')
             .attr('class', 'brush')
             .call(vis.brush)
-        vis.overlay.on('click', (event) => {console.log(event); vis.displayTooltipStates(event)});
+        vis.overlay.on('click', (event) => {vis.displayTooltipStates(event)});
         // quadtree
         vis.quadTree = d3.quadtree()
             .x((d) => d.pca_x)
@@ -167,11 +186,65 @@ class Overview {
         // axis
         vis.xAxisG.call(vis.xAxis);
         vis.yAxisG.call(vis.yAxis);
+        // draw hull
+        vis.drawRegion();
+        // draw Voronoi
+        vis.drawVoronoi();
         // draw nodes
         vis.drawStates();
         // draw trjs
         vis.drawTrajectory();
     }
+
+    drawRegion() {
+        let vis = this;
+        vis.contextRegion.clearRect(0, 0, vis.width, vis.height);
+        var hull = [];
+        vis.hull.forEach((h) => hull.push({x: vis.states[h].pca_x, y: vis.states[h].pca_y}));
+        var gen = d3.line()
+            .x((d) => vis.xScale(d.x))
+            .y((d) => vis.yScale(d.y))
+            .curve(d3.curveLinear)
+        gen.context(vis.contextRegion);
+        vis.contextRegion.beginPath();
+        gen(hull);
+        var cf = 'grey';
+        vis.contextRegion.strokeStyle = cf;
+        vis.contextRegion.setLineDash([10, 5]);
+        vis.contextRegion.lineWidth = 3;
+        vis.contextRegion.stroke();
+    }
+
+    drawVoronoi() {
+        let vis = this;
+        var cf = 'grey';
+        vis.contextVor.strokeStyle = cf;
+        vis.contextVor.setLineDash([10, 5]);
+        vis.contextVor.lineWidth = 3;
+        vis.contextVor.clearRect(0, 0, vis.width, vis.height);
+        var ridge = [{x: 1.82882116, y:1.80069572}, {x: 2.60314502, y:1.9296819}];
+        var endpoint = [{x: -4.411104455607263, y: 5.011169997810457, r: 0}, 
+                        {x: -3.1943716580989547, y: -6.263976988353363, r: 0},
+                        {x: 8.600064309381615, y: 12.231706127208183, r: 1},
+                        {x: 6.17185900905939, y: -1.686892561319461, r: 1}];
+        var gen = d3.line()
+            .x((d) => vis.xScale(d.x))
+            .y((d) => vis.yScale(d.y))
+            .curve(d3.curveLinear)
+        gen.context(vis.contextVor);
+        vis.contextVor.beginPath();
+        gen(ridge);
+        vis.contextVor.stroke();
+        vis.contextVor.closePath();
+        endpoint.forEach((e) => {
+            vis.contextVor.beginPath();
+            var seg = [ridge[e.r], {x: e.x, y: e.y}];
+            gen(seg);
+            vis.contextVor.stroke();
+            vis.contextVor.closePath();
+        });
+    }
+
 
     drawStates() {
         let vis = this;
@@ -261,7 +334,6 @@ class Overview {
     }
 
     updateChart(event) {
-        console.log(event);
         let vis = this;
         let extent = event.selection;
         if(!extent){
@@ -273,6 +345,8 @@ class Overview {
             vis.yScale.domain([vis.yScale.invert(extent[1][1]), vis.yScale.invert(extent[0][1])]);
             vis.overlay.select(".brush").call(vis.brush.move, null);
         }
+        vis.drawRegion();
+        vis.drawVoronoi();
         vis.drawTrajectory();
         vis.drawStates();
         vis.drawSelection(vis.seldna);
@@ -334,6 +408,11 @@ class Overview {
                 }
             })
         });
+    }
+
+    computeIntersection(x1, x2, x3, x4, y1, y2, y3, y4){
+        return {x: ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4)),
+        y: ((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4))/((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4))};
     }
 
 }

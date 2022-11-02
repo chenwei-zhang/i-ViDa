@@ -74,7 +74,6 @@ d3.json('data/PT4_dna.json').then((data) => {
             dispatcher,
         );
         studio.updateVis();
-        
     })
 });
 
