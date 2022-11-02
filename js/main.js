@@ -48,8 +48,7 @@ d3.json('data/PT4_dna.json').then((data) => {
         pt3_ranktime = pt3_trj.map((x)=> pt3_sorttime.indexOf(x)+1);
         pt3_trj.forEach((trj, index) => {
             trj.ranktime = pt3_ranktime[index];
-        })
-        console.log(pt3_trj);
+        });
     }).then(() => {
         overview = new Overview(
             {
@@ -75,7 +74,6 @@ d3.json('data/PT4_dna.json').then((data) => {
             dispatcher,
         );
         studio.updateVis();
-        
     })
 });
 

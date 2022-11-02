@@ -42,11 +42,22 @@ body {
 
 #overview-overlay {
     position: absolute;
+    z-index: 5;
+}
+
+#overview-canvas-hull {
+    position: absolute;
+    z-index: 1;
+}
+
+#overview-canvas-vor {
+    position: absolute;
     z-index: 4;
 }
+
 #overview-slider {
     position: absolute;
-    z-index: 5;
+    z-index: 6;
 }
 .slider{
     cursor: grabbing;
