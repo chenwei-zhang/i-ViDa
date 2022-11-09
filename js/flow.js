@@ -169,7 +169,7 @@ class Flow{
             .attr('fill', vis.sScale(idx))
             .attr('stroke', '#5a5a5a')
             .attr('stroke-width', 0.5)
-            .attr('opacity', 0.6)
+            .attr('opacity', 0.2)
             .attr('x', (d) => vis.xScale(d.band))
             .attr('y', (d) => vis.yScale(d3.max(d.data, (d) => d.energy)))
             .attr('width', vis.xScale(2)-vis.xScale(1))
@@ -249,11 +249,43 @@ class Flow{
                 }
             })
             .on('mouseout', function(e, d) {
-                d3.select(this).attr('opacity', 0.6);
+                d3.select(this).attr('opacity', 0.2);
                 vis.bintool.style('display', 'none')
             })
             .attr("clip-path", "url(#clip)");
+
+        vis.line = vis.svg
+            .append('path')
+            .datum(bucket)
+            .attr('class', 'flow-line')
+            .attr('id', (d) => `flow-line${trajectory.id}`)
+            .attr('fill', 'none')
+            .attr('stroke', vis.sScale(idx))
+            .attr('stroke-width', 1)
+            .attr('d', d3.line()
+                .x((d) => vis.xScale(d.band+0.5))
+                .y((d) => vis.yScale(d3.mean(d.data, (d) => d.energy)))
+            );
+
+        vis.knots = vis.svg.selectAll(`#flow-knot${trajectory.id}`)
+            .data(bucket, (d) => d.band);
+        vis.knotsEnter = vis.knots
+            .enter()
+            .append('path')
+            .attr('class', 'flow-knot')
+            .attr('id', (d) => `flow-knot${trajectory.id}`);
+        vis.knotsEnter
+            .merge(vis.knots)
+            .attr('d', d3.symbol().type(d3.symbolCross).size(15))
+            .attr('fill', vis.sScale(idx))
+            .attr('stroke', '#5a5a5a')
+            .attr('stroke-width', 0.1)
+            .attr('transform', (d) => `translate(${vis.xScale(d.band+0.5)}, ${vis.yScale(d3.mean(d.data, (d) => d.energy))}) rotate(-45)`)
+            .attr('opacity', (d) => (vis.xScale(d.band+0.5)>0 && vis.xScale(d.band+0.5)<vis.width)? 1:0);
+            
         vis.rects.exit().remove();
+        vis.knots.exit().remove();
+        vis.line.exit().remove();
     }
 
     idled() {

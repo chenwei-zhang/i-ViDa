@@ -98,8 +98,9 @@ dispatcher.on('selTrj', (selectedTrj) => {
     overview.seltrj = selectedTrj;
     overview.drawTrajectory();
     d3.selectAll(`.flow-rect`).remove().exit();
+    d3.selectAll(`.flow-knot`).remove().exit();
+    d3.selectAll(`.flow-line`).remove().exit();
     flow.seltrj = selectedTrj;
-    console.log('after', flow.seltrj);
     flow.drawAllFlow();
 })
 
