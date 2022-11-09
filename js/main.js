@@ -47,7 +47,14 @@ d3.json('data/PT4_dna.json').then((data) => {
         pt3_sorttime = pt3_trj.slice().sort((a, b) => (a.totaltime - b.totaltime));
         pt3_ranktime = pt3_trj.map((x)=> pt3_sorttime.indexOf(x)+1);
         pt3_trj.forEach((trj, index) => {
-            trj.ranktime = pt3_ranktime[index];
+            trj.ranktime = 101-pt3_ranktime[index];
+            let count = 0;
+            let cumltime = [];
+            trj.time.forEach((t) => {
+                count = count + t;
+                cumltime.push(count);
+            });
+            trj.cumltime = cumltime;
         });
     }).then(() => {
         overview = new Overview(
@@ -78,7 +85,7 @@ d3.json('data/PT4_dna.json').then((data) => {
             {
                 parentElement: '#flow',
                 width: 900,
-                height: 500,
+                height: 300,
                 margin: {left: 30, right: 20, top: 20, bottom: 20},
             },
             pt3_trj,
@@ -90,17 +97,10 @@ d3.json('data/PT4_dna.json').then((data) => {
 dispatcher.on('selTrj', (selectedTrj) => {
     overview.seltrj = selectedTrj;
     overview.drawTrajectory();
-    d3.selectAll('.flow-line').remove().exit();
+    d3.selectAll(`.flow-rect`).remove().exit();
     flow.seltrj = selectedTrj;
-    console.log(selectedTrj)
-    if(selectedTrj.every(e => e===null)){
-        flow.seltrj = [88,97,24];
-        flow.flag = 0;
-        flow.drawAllFlow(flow.flag, null);
-    }else{
-        flow.flag = 1;
-        flow.drawAllFlow(flow.flag, null);
-    }
+    console.log('after', flow.seltrj);
+    flow.drawAllFlow();
 })
 
 const callToolTip1 = function(e, d, vis) {

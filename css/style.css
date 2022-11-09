@@ -7,18 +7,21 @@ body {
 }
 .container {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     margin: 0 auto;
     justify-content: center;
 }
 
-.vis1 {
-    width: 1000px;
+#ctn1 {
+    width: 1400px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     background-color: #fff;
 }
-
+.vis1 {
+    width: 900px;
+    background-color: #fff;
+}
 #overview-svg {
     position: absolute;
     z-index: 1;
@@ -97,10 +100,14 @@ body {
     transform: translate(265px, -640px);
 }
 
+.ctn2 {
+    width: 1400px;
+}
+
 .vis2 {
-    width: 1500px;
+    width: 1400px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     background-color: #fff;
 }
 
@@ -121,8 +128,8 @@ body {
     height: 70px;
     padding: 2px;
     font-size: 10px;
-    background: seashell;
-    border: 0px;
+    background: #e5ecf6;
+    border: 2px;
     border-radius: 8px;
     opacity: 0;
     pointer-events: none;
