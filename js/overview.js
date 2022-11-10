@@ -372,7 +372,7 @@ class Overview {
         var dX = vis.xScale(closest.pca_x);
         var dY = vis.yScale(closest.pca_y);
         var dist = Math.sqrt(((mouse[0]-dX)**2+(mouse[1]-dY)**2));
-        if((dist < vis.rScale(closest.time)+10 && closest.density.size >= vis.k) 
+        if((dist < vis.rScale(closest.time) && closest.density.size >= vis.k) 
         || ((closest.id==vis.fID||closest.id==vis.iID) && (dist < 15))){
             if(vis.seldna.lenngth == 0 || (!vis.seldna.includes(closest))){
                 vis.seldna.push(closest);
