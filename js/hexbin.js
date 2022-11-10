@@ -83,8 +83,10 @@ class Hexbin{
             .on('mousemove', function(e, d) {
                 d3.select('#tooltip3').style('display', 'inline-block');
                 vis.config.callToolTip(e, d, vis);
+                d3.select(this).attr('stroke-width', 3);
             }).on('mouseout', function() {
                 d3.select('#tooltip3').style('display', 'none');
+                d3.selectAll('.hexbin-bin').attr('stroke-width', 1);
             });
     }
 
