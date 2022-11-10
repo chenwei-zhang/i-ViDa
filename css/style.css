@@ -120,6 +120,9 @@ body {
     font-family: American Typewriter, serif;
     transform: rotate(10deg);
 }
+.active {
+    opacity: 0.8;
+}
 #tooltip1 {
     display: none;
     position: absolute;
@@ -146,4 +149,19 @@ body {
     opacity: 0.8;
     pointer-events: none;
     z-index: 6;
+}
+
+#tooltip3 {
+    display: none;
+    text-align: center;
+    position: absolute;
+    transform: translate(-154px, 216px);
+    font-size: 10px;
+    width: 130px;
+    height: 60px;
+    padding: 2px;
+    background: #e5ecf6;
+    border: 2px;
+    opacity: 0.8;
+    pointer-events: none;
 }

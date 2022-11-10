@@ -1,6 +1,6 @@
 class Flow{
 
-    constructor(_config, _data_trj){
+    constructor(_config, _data_trj, _dispatcher){
         this.config = {
             parentElement: _config.parentElement,
             containerWidth: _config.width,
@@ -10,6 +10,8 @@ class Flow{
         this.trajectory = _data_trj;
         this.seltrj = [];
         this.idleTimeout = null;
+        this.selbin = [];
+        this.dispatcher = _dispatcher;
         this.initVis();
     }
 
@@ -21,9 +23,6 @@ class Flow{
         // xscales
         vis.xScale = d3.scaleLinear()
             .domain([0, 100])
-            .range([0, vis.width]);
-        // dynamic xscale
-        vis.dScale = d3.scaleLinear()
             .range([0, vis.width]);
         let trjmin = []; let trjmax = [];
         vis.trajectory.forEach((trj) => {
@@ -63,10 +62,6 @@ class Flow{
             .append('g')
             .attr('class', 'axis x-axis')
             .attr('transform', `translate(0, ${vis.height})`);
-        vis.dAxisG = vis.svg
-            .append('g')
-            .attr('class', 'axis x-axis')
-            .attr('transform', `translate(0, ${vis.height})`);
         vis.yAxisG = vis.svg
             .append('g')
             .attr('class', 'axis y-axis');
@@ -95,6 +90,7 @@ class Flow{
             .style('text-align', 'center')
             .style('text-anchor', 'middle')
             .style('opacity', 0.3)
+            .style('pointer-events', 'none');
     }
 
     updateVis() {
@@ -183,7 +179,7 @@ class Flow{
                     }
                 });
                 if(count == 1){
-                    d3.select(this).attr('opacity', 1);
+                    d3.select(this).attr('opacity', 0.6);
                     d3.selectAll('.flow-box').remove().exit();
                     d3.selectAll('.flow-toto').remove().exit();
                     d3.selectAll('.flow-vertical').remove().exit();
@@ -251,6 +247,12 @@ class Flow{
             .on('mouseout', function(e, d) {
                 d3.select(this).attr('opacity', 0.2);
                 vis.bintool.style('display', 'none')
+            }).on('click', function(e, d){
+                d3.select(this).classed('active', true);
+                d.data.forEach((data) => {
+                    vis.selbin.push(data);
+                });
+                vis.dispatcher.call('selBin', e, vis.selbin, vis.sScale(idx));
             })
             .attr("clip-path", "url(#clip)");
 
@@ -265,7 +267,7 @@ class Flow{
             .attr('d', d3.line()
                 .x((d) => vis.xScale(d.band+0.5))
                 .y((d) => vis.yScale(d3.mean(d.data, (d) => d.energy)))
-            );
+            ).attr("clip-path", "url(#clip)");
 
         vis.knots = vis.svg.selectAll(`#flow-knot${trajectory.id}`)
             .data(bucket, (d) => d.band);
@@ -295,9 +297,11 @@ class Flow{
 
     updateChart(event) {
         let vis = this;
-        d3.selectAll('.flow-line').remove().exit();
         let extent = event.selection;
         if(!extent){
+            d3.selectAll('.flow-rect.active').classed('active', false);
+            vis.dispatcher.call('selBin', event, vis.selbin, null);
+            vis.selbin = [];
             if (!idleTimeout) return idleTimeout = setTimeout(vis.idled, 350);
             vis.xScale.domain([0, 100]);
         }else{
@@ -305,6 +309,7 @@ class Flow{
             vis.svg.select('.brush').call(vis.brush.move, null);
         }
         vis.xAxisG.call(vis.xAxis);
+        d3.selectAll('.flow-line').remove().exit();
         vis.drawAllFlow();
     }
 }

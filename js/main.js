@@ -3,7 +3,7 @@ let pt3_dna,
     pt3_trj;
 
 let overview, studio;
-const dispatcher = d3.dispatch('selTrj');
+const dispatcher = d3.dispatch('selTrj', 'selBin');
 
 /**
  * Load PT3 DNA data
@@ -89,8 +89,21 @@ d3.json('data/PT4_dna.json').then((data) => {
                 margin: {left: 30, right: 20, top: 20, bottom: 20},
             },
             pt3_trj,
+            dispatcher,
         );
         flow.updateVis();
+        hexbin = new Hexbin(
+            {
+                parentElement: '#hex',
+                width: 500,
+                height: 300,
+                margin: {left: 30, right: 20, top: 20, bottom: 20},
+                callToolTip: callToolTip3,
+            },
+            pt3_dna,
+            pt3_trj,
+        );
+        hexbin.updateVis();
     })
 });
 
@@ -102,7 +115,15 @@ dispatcher.on('selTrj', (selectedTrj) => {
     d3.selectAll(`.flow-line`).remove().exit();
     flow.seltrj = selectedTrj;
     flow.drawAllFlow();
-})
+});
+
+dispatcher.on('selBin', (selectedBin, sScale) => {
+    if(selectedBin.length < 1){
+        d3.selectAll('.hexbin-sel').remove().exit();
+        return;
+    }
+    hexbin.showSelBin(selectedBin, sScale);
+});
 
 const callToolTip1 = function(e, d, vis) {
     d3.select("#tooltip1").style("display", "inline-block").style("opacity", 1);
@@ -129,6 +150,18 @@ const callToolTip2 = function(e, d, vis) {
                 <br> Energy: ${d.energy}<br>
                 <br> Time: ${d.time}<br>
                 <br> Density: ${d.density.size} ${d.density.size<=5? '['+[...d.density].join(' ')+']':''}<br>
+            </div>
+            `
+        );
+};
+
+const callToolTip3 = function(e, d, vis) {
+    d3.select("#tooltip3")
+        .html(
+            `
+            <div style='font-size:10px'>
+                <br> # of states: ${d.length}<br>
+                <br> Avg. energy: ${d3.mean(d, (data) => data.energy).toFixed(2)}<br>
             </div>
             `
         );
