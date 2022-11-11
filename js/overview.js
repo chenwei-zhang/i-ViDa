@@ -315,7 +315,7 @@ class Overview {
         trj.trj.forEach((i, idx) => {
             if(trj.trj.length >= 3000){
                 if(idx % Math.floor(trj.trj.length/3000) == 0 || (idx <= trj.trj.length-1&&idx >= trj.trj.length-10)){
-                    if(i.density.size > vis.k)
+                    if(i.density.size >= vis.k)
                         pos.push({x: i.pca_x, y: i.pca_y});
                 }
             }else{
