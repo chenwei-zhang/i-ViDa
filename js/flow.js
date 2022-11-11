@@ -299,10 +299,10 @@ class Flow{
         let vis = this;
         let extent = event.selection;
         if(!extent){
+            if (!idleTimeout) return idleTimeout = setTimeout(vis.idled, 350);
             d3.selectAll('.flow-rect.active').classed('active', false);
             vis.dispatcher.call('selBin', event, vis.selbin, null);
             vis.selbin = [];
-            if (!idleTimeout) return idleTimeout = setTimeout(vis.idled, 350);
             vis.xScale.domain([0, 100]);
         }else{
             vis.xScale.domain([vis.xScale.invert(extent[0]), vis.xScale.invert(extent[1])]);

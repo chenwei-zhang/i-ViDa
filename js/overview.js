@@ -319,8 +319,9 @@ class Overview {
                         pos.push({x: i.pca_x, y: i.pca_y});
                 }
             }else{
-                if(i.density.size > vis.k)
+                if(i.density.size >=  vis.k){
                     pos.push({x: i.pca_x, y: i.pca_y});
+                }
             }
         });
         var gen = d3.line()
