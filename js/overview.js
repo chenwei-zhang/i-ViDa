@@ -289,12 +289,22 @@ class Overview {
             cf = d3.rgb(d3.interpolateRainbow(vis.cScale(dna.energy)));
             cf.opacity = 0.6;
         }else{
-            cf = d3.rgb('green');
+            cf = d3.rgb('#719074');
             cf.opacity = 1.0;
         }
         vis.context.fillStyle = cf;
         vis.context.fill();
         vis.context.stroke();
+        if(dna.id == vis.iID){
+            vis.context.fillStyle = 'rgb(91, 91, 91)';
+            vis.context.font = '25px American Typewriter';
+            vis.context.fillText('I', cx-5, cy+7);
+        }
+        if(dna.id == vis.fID){
+            vis.context.fillStyle = 'rgb(91, 91, 91)';
+            vis.context.font = '25px American Typewriter';
+            vis.context.fillText('F', cx-7, cy+8);
+        }
     }
 
     drawTrajectory() {

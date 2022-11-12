@@ -64,6 +64,42 @@ class Info{
         }
         d3.selectAll('.info-title')
             .text(vis.mode =='empty'? 'Click a Bin to View its Info': `Top ${vis.data.length} Structure with Minimum Energy`);
+        if(vis.mode == 'empty'){
+            vis.svg
+                .append('circle')
+                .attr('class', 'info-util')
+                .attr('cx', 75)
+                .attr('cy', 75)
+                .attr('r', 15)
+                .attr('fill', 'none')
+                .attr('stroke', '#5a5a5a')
+                .attr('stroke-width', 3);
+            vis.svg
+                .append('circle')
+                .attr('class', 'info-util')
+                .attr('cx', 75)
+                .attr('cy', 175)
+                .attr('r', 15)
+                .attr('fill', 'none')
+                .attr('stroke', '#5a5a5a')
+                .attr('stroke-width', 3);
+            vis.svg
+                .append('text')
+                .attr('class', 'info-util')
+                .attr('x', 75)
+                .attr('y', 82)
+                .text('I')
+                .style('font-size', 20)
+                .style('text-anchor', 'middle');
+            vis.svg
+                .append('text')
+                .attr('class', 'info-util')
+                .attr('x', 75)
+                .attr('y', 182)
+                .text('F')
+                .style('font-size', 20)
+                .style('text-anchor', 'middle');;
+        }
         vis.svg
             .attr('height', vis.data.length*100+10);
         vis.rank = d3.rank(vis.data, (d) => d.energy);
