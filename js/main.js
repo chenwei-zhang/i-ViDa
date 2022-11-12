@@ -1,9 +1,8 @@
-let trj_filter = 2000;
 let pt3_dna,
     pt3_trj;
 
 let overview, studio;
-const dispatcher = d3.dispatch('selTrj', 'selBin');
+const dispatcher = d3.dispatch('selTrj', 'selBin', 'selHex');
 
 /**
  * Load PT3 DNA data
@@ -102,8 +101,19 @@ d3.json('data/PT4_dna.json').then((data) => {
             },
             pt3_dna,
             pt3_trj,
+            dispatcher,
         );
         hexbin.updateVis();
+        info = new Info(
+            {
+                parentElement: '#info',
+                width: 370,
+            },
+            pt3_dna,
+            [],
+            [pt3_dna[0], pt3_dna[291]],
+        );
+        info.updateVis();
     })
 });
 
@@ -113,17 +123,21 @@ dispatcher.on('selTrj', (selectedTrj) => {
     d3.selectAll(`.flow-rect`).remove().exit();
     d3.selectAll(`.flow-knot`).remove().exit();
     d3.selectAll(`.flow-line`).remove().exit();
+    flow.selbin = [];
     flow.seltrj = selectedTrj;
     flow.drawAllFlow();
     d3.selectAll('.hexbin-sel').remove().exit();
 });
 
 dispatcher.on('selBin', (selectedBin, sScale) => {
-    if(selectedBin.length < 1){
-        d3.selectAll('.hexbin-sel').remove().exit();
-        return;
-    }
+    d3.selectAll('.hexbin-sel').remove().exit();
     hexbin.showSelBin(selectedBin, sScale);
+});
+
+dispatcher.on('selHex', (selectedData) => {
+    info.mode = 'bin';
+    info.data = selectedData;
+    info.updateVis();
 });
 
 const callToolTip1 = function(e, d, vis) {

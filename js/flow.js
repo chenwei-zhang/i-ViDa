@@ -240,7 +240,12 @@ class Flow{
                         .attr('class', 'flow-text')
                         .text(`# of hops: ${data.data.length}`)
                         .style('font-size', 10)
-                        .attr('transform', `translate(190, 15)`)
+                        .attr('transform', `translate(170, 15)`)
+                    vis.bintool.append('text')
+                        .attr('class', 'flow-text')
+                .text(`Cumulative time: ${(trajectory.totaltime*data.band/100).toExponential(3)}`)
+                        .style('font-size', 10)
+                        .attr('transform', `translate(25, 15)`)
                         
                 }
             })
@@ -248,11 +253,26 @@ class Flow{
                 d3.select(this).attr('opacity', 0.2);
                 vis.bintool.style('display', 'none')
             }).on('click', function(e, d){
-                d3.select(this).classed('active', true);
-                d.data.forEach((data) => {
-                    vis.selbin.push(data);
+                let count = 0;
+                vis.seltrj.forEach((sel) => {
+                    if(sel){
+                        count += 1;
+                    }
                 });
-                vis.dispatcher.call('selBin', e, vis.selbin, vis.sScale(idx));
+                if(count == 1){
+                    const active = d3.select(this).classed('active');
+                    if(!active){
+                        d3.select(this).classed('active', true);
+                        vis.selbin.push(d);
+                        vis.dispatcher.call('selBin', e, vis.selbin, vis.sScale(idx));
+                    }else{
+                        d3.select(this).classed('active', false);
+                        vis.selbin = vis.selbin.filter((v) => {
+                            return v.band !== d.band;
+                        });
+                        vis.dispatcher.call('selBin', e, vis.selbin, vis.sScale(idx));
+                    }
+                }
             })
             .attr("clip-path", "url(#clip)");
 

@@ -86,8 +86,8 @@ body {
 }
 
 #trajectory-clip {
-    height: 660px;
-    transform: translate(0, 20px);
+    height: 1250px;
+    transform: translate(0, 40px);
     overflow-y: scroll;
     overflow-x: hidden;
 }
@@ -97,7 +97,7 @@ body {
     width: 200px;
     height: 100px;
     padding: 10px;
-    transform: translate(265px, -640px);
+    transform: translate(265px, -1240px);
 }
 
 .ctn2 {
@@ -107,7 +107,7 @@ body {
 .vis2 {
     width: 1400px;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     background-color: #fff;
 }
 
@@ -164,4 +164,23 @@ body {
     border: 2px;
     opacity: 0.8;
     pointer-events: none;
+}
+
+#info {
+    text-align: center;
+    position: absolute;
+    transform: translate(500px, 0px);
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 0px;
+    margin-right: 20px;
+    font-size: 10px;
+    width: 380px;
+    height: 260px;
+    padding: 0px;
+    opacity: 0.8;
+    border: 1px solid black;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    overflow-wrap: normal;
 }

@@ -1,6 +1,6 @@
 class Hexbin{
 
-    constructor(_config, _data_dna, _data_trj){
+    constructor(_config, _data_dna, _data_trj, _dispatcher){
         this.config = {
             parentElement: _config.parentElement,
             containerWidth: _config.width,
@@ -10,6 +10,7 @@ class Hexbin{
         this.margin = _config.margin;
         this.trajectory = _data_trj;
         this.states = _data_dna;
+        this.dispatcher = _dispatcher;
         this.initVis();
     }
 
@@ -92,7 +93,13 @@ class Hexbin{
 
     showSelBin(selectedBin, sScale) {
         let vis = this;
-        vis.selBin = vis.hex(selectedBin);
+        const bins = [];
+        selectedBin.forEach((selbin) => {
+            selbin.data.forEach((b) => {
+                bins.push(b);
+            })
+        });
+        vis.selBin = vis.hex(bins);
         vis.sb = vis.svg.selectAll('.hexbin-sel')
             .data(vis.selBin);
         vis.sbEnter = vis.sb
@@ -103,9 +110,14 @@ class Hexbin{
             .merge(vis.sb)
             .attr('d', vis.hex.hexagon())
             .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
-            .attr('fill', 'none')
-            .attr('opacity', 1)
+            .attr('fill', sScale)
+            .attr('fill-opacity', 0)
             .attr('stroke', sScale)
             .attr('stroke-width', 3)
+            .attr('cursor', 'pointer')
+            .on('click', function(e, d) {
+                d = [...new Set(d)];
+                vis.dispatcher.call('selHex', e, d);
+            });
     }
 }
