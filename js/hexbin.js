@@ -38,8 +38,8 @@ class Hexbin{
             .append('g')
             .attr('transform', `translate(${vis.margin.left}, ${vis.margin.top})`);
         // axis group
-        vis.xAxis = d3.axisBottom(vis.xScale).ticks(4).tickSizeOuter(-vis.height);
-        vis.yAxis = d3.axisLeft(vis.yScale).ticks(4).tickSizeOuter(-vis.width);
+        vis.xAxis = d3.axisBottom(vis.xScale).ticks(3).tickSize(-vis.height);
+        vis.yAxis = d3.axisLeft(vis.yScale).ticks(3).tickSize(-vis.width);
         vis.xAxisG = vis.svg
             .append('g')
             .attr('class', 'axis x-axis')
@@ -116,6 +116,8 @@ class Hexbin{
             .attr('stroke-width', 3)
             .attr('cursor', 'pointer')
             .on('click', function(e, d) {
+                vis.svg.selectAll('.hexbin-sel').attr('fill-opacity', 0);
+                d3.select(this).attr('fill-opacity', 1);
                 d = [...new Set(d)];
                 vis.dispatcher.call('selHex', e, d);
             });

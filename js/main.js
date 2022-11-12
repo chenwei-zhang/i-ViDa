@@ -127,6 +127,8 @@ dispatcher.on('selTrj', (selectedTrj) => {
     flow.seltrj = selectedTrj;
     flow.drawAllFlow();
     d3.selectAll('.hexbin-sel').remove().exit();
+    info.mode = 'empty';
+    info.updateVis();
 });
 
 dispatcher.on('selBin', (selectedBin, sScale) => {
