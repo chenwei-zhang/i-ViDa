@@ -139,8 +139,12 @@ dispatcher.on('selBin', (selectedBin, sScale) => {
 });
 
 dispatcher.on('selHex', (selectedData) => {
-    info.mode = 'bin';
-    info.data = selectedData;
+    if(!selectedData){
+        info.mode = 'empty';
+    }else{
+        info.mode = 'bin';
+        info.data = selectedData;
+    }
     info.updateVis();
 });
 

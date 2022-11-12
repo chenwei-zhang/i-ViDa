@@ -54,10 +54,24 @@ class Hexbin{
 
     updateVis() {
         let vis = this;
+        vis.svg
+            .append('text')
+            .text('I')
+            .attr('x', vis.xScale(vis.states[0].pca_x)-4)
+            .attr('y', vis.yScale(vis.states[0].pca_y)+5)
+            .style('font-size', 10)
+            .style('text-anchor', 'middle');;
+        vis.svg
+            .append('text')
+            .text('F')
+            .attr('x', vis.xScale(vis.states[291].pca_x)-1)
+            .attr('y', vis.yScale(vis.states[291].pca_y)+10)
+            .style('font-size', 10)
+            .style('text-anchor', 'middle');;
         vis.hex = d3.hexbin()
             .x((d) => vis.xScale(d.pca_x))
             .y((d) => vis.yScale(d.pca_y))
-            .radius(7)
+            .radius(8)
             .extent([[vis.margin.left, vis.margin.top], 
                 [vis.width - vis.margin.right, vis.height - vis.margin.bottom]]);
         vis.bin = vis.hex(vis.states);
@@ -116,10 +130,17 @@ class Hexbin{
             .attr('stroke-width', 3)
             .attr('cursor', 'pointer')
             .on('click', function(e, d) {
-                vis.svg.selectAll('.hexbin-sel').attr('fill-opacity', 0);
-                d3.select(this).attr('fill-opacity', 1);
-                d = [...new Set(d)];
-                vis.dispatcher.call('selHex', e, d);
+                const active = d3.select(this).classed('sb');
+                if(!active){
+                    vis.svg.selectAll('.hexbin-sel').attr('fill-opacity', 0);
+                    d3.select(this).attr('fill-opacity', 1).classed('sb', true);
+                    d = [...new Set(d)];
+                    vis.dispatcher.call('selHex', e, d);
+                }else{
+                    vis.svg.selectAll('.hexbin-sel').attr('fill-opacity', 0);
+                    d3.select(this).classed('sb', false);
+                    vis.dispatcher.call('selHex', e, null);
+                }
             });
     }
 }
