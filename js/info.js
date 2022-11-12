@@ -65,7 +65,7 @@ class Info{
         d3.selectAll('.info-title')
             .text(vis.mode =='empty'? 'Click a Bin to View its Info': `Top ${vis.data.length} Structure with Minimum Energy`);
         vis.svg
-            .attr('height', vis.data.length*80+10);
+            .attr('height', vis.data.length*100+10);
         vis.rank = d3.rank(vis.data, (d) => d.energy);
         vis.data.forEach((d, i) => {
             d.rank = vis.rank[i]+1;
@@ -80,7 +80,7 @@ class Info{
             .attr('x1', 100)
             .attr('x2', 100)
             .attr('y1', 3)
-            .attr('y2', vis.data.length*80)
+            .attr('y2', vis.data.length*100)
             .attr('fill', 'none')
             .attr('stroke', '#5a5a5a')
             .attr('stroke-width', 3)
@@ -97,8 +97,8 @@ class Info{
             .attr('id', (d) => d.rank)
             .attr('x1', 0)
             .attr('x2', vis.width)
-            .attr('y1', (d) => d.rank*80)
-            .attr('y2', (d) => d.rank*80)
+            .attr('y1', (d) => d.rank*100)
+            .attr('y2', (d) => d.rank*100)
             .attr('fill', 'none')
             .attr('stroke', '#5a5a5a')
             .attr('stroke-width', 3)
@@ -106,7 +106,7 @@ class Info{
         vis.boxEnter
             .append('circle')
             .attr('cx', 50)
-            .attr('cy', (d) => d.rank*80-40)
+            .attr('cy', (d) => d.rank*100-50)
             .attr('r', (d) => vis.rScale(d.time))
             .attr('fill', (d) => d3.interpolateRainbow(vis.cScale(d.energy)))
             .attr('opacity', 0.5)
@@ -115,7 +115,7 @@ class Info{
         vis.boxEnter
             .append('text')
             .attr('x', 235)
-            .attr('y', (d) => d.rank*80-55)
+            .attr('y', (d) => d.rank*100-70)
             .text((d) => `DP: ${d.dp}`)
             .style('font-size', 10)
             .style('text-align', 'center')
@@ -123,7 +123,7 @@ class Info{
         vis.boxEnter
             .append('text')
             .attr('x', 235)
-            .attr('y', (d) => d.rank*80-35)
+            .attr('y', (d) => d.rank*100-50)
             .text((d) => `Energy: ${d.energy}`)
             .style('font-size', 10)
             .style('text-align', 'center')
@@ -131,15 +131,15 @@ class Info{
         vis.boxEnter
             .append('text')
             .attr('x', 235)
-            .attr('y', (d) => d.rank*80-15)
-            .text((d) => `Occupancy Density: ${d.density.size}`)
+            .attr('y', (d) => d.rank*100-30)
+            .text((d) => `Density: ${d.density.size}`)
             .style('font-size', 10)
             .style('text-align', 'center')
             .style('text-anchor', 'middle');
         vis.boxEnter
             .append('text')
             .attr('x', 50)
-            .attr('y', (d) => d.rank*80-65)
+            .attr('y', (d) => d.rank*100-85)
             .text((d) => `ID: ${d.id}`)
             .style('font-size', 10)
             .style('text-align', 'center')
