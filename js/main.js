@@ -134,6 +134,8 @@ dispatcher.on('selTrj', (selectedTrj) => {
 dispatcher.on('selBin', (selectedBin, sScale) => {
     d3.selectAll('.hexbin-sel').remove().exit();
     hexbin.showSelBin(selectedBin, sScale);
+    info.mode = 'empty';
+    info.updateVis();
 });
 
 dispatcher.on('selHex', (selectedData) => {
