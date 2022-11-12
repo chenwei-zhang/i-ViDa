@@ -102,9 +102,8 @@ class Info{
         }
         vis.svg
             .attr('height', vis.data.length*100+10);
-        vis.rank = d3.rank(vis.data, (d) => d.energy);
-        vis.data.forEach((d, i) => {
-            d.rank = vis.rank[i]+1;
+        vis.data.forEach((v, i) => {
+            v.rank = i+1;
         });
         vis.renderBin();
     }
