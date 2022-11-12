@@ -88,7 +88,7 @@ class Info{
                 .attr('class', 'info-util')
                 .attr('x', 75)
                 .attr('y', 82)
-                .text('I')
+                .text('F')
                 .style('font-size', 20)
                 .style('text-anchor', 'middle');
             vis.svg
@@ -96,7 +96,7 @@ class Info{
                 .attr('class', 'info-util')
                 .attr('x', 75)
                 .attr('y', 182)
-                .text('F')
+                .text('I')
                 .style('font-size', 20)
                 .style('text-anchor', 'middle');;
         }
