@@ -34,7 +34,9 @@ class Flow{
             .domain([d3.max(trjmax), d3.min(trjmin)-1])
             .range([0, vis.height]);
         // selection trj category
-        vis.sScale = d3.scaleOrdinal(d3.schemeDark2);
+        vis.sScale = d3.scaleOrdinal()
+        .domain([2, 0, 1])
+        .range(["#1f77b4","#2ca02c","#f0027f"]);
         // scales of binning
         vis.byScale = d3.scaleLinear().range([0, 250]);
         vis.bxScale = d3.scaleBand().domain([1]).range([50]);
@@ -251,7 +253,7 @@ class Flow{
             })
             .on('mouseout', function(e, d) {
                 d3.select(this).attr('opacity', 0.2);
-                vis.bintool.style('display', 'none')
+                vis.bintool.style('display', 'none');
             }).on('click', function(e, d){
                 let count = 0;
                 vis.seltrj.forEach((sel) => {

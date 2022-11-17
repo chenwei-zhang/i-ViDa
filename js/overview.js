@@ -50,7 +50,9 @@ class Overview {
             .range([1, 0.4]);
 
         // selection trj category
-        vis.sScale = d3.scaleOrdinal(d3.schemeDark2);
+        vis.sScale = d3.scaleOrdinal()
+        .domain([2, 0, 1])
+        .range(["#1f77b4","#2ca02c","#f0027f"]);
         // svg of the vis
         vis.svg = d3.select(vis.config.parentElement)
             .append('svg')
@@ -286,25 +288,29 @@ class Overview {
         vis.context.arc(cx, cy, cr, 0, 2*Math.PI);
         var cf = null;
         if(dna.id != vis.iID && dna.id != vis.fID){
-            cf = d3.rgb(d3.interpolateRainbow(vis.cScale(dna.energy)));
-            cf.opacity = 0.6;
+            cf = d3.rgb(d3.interpolatePlasma(vis.cScale(dna.energy)));
+            cf.opacity = 0.8;
         }else{
-            cf = d3.rgb('#719074');
+            cf = d3.rgb('#00ff00');
             cf.opacity = 1.0;
         }
         vis.context.fillStyle = cf;
         vis.context.fill();
-        vis.context.stroke();
         if(dna.id == vis.iID){
+            vis.context.strokeStyle = 'black';
+            vis.context.lineWidth = 1.0;
             vis.context.fillStyle = 'rgb(91, 91, 91)';
             vis.context.font = '25px American Typewriter';
             vis.context.fillText('I', cx-5, cy+7);
         }
         if(dna.id == vis.fID){
+            vis.context.strokeStyle = 'black';
+            vis.context.lineWidth = 1.0;
             vis.context.fillStyle = 'rgb(91, 91, 91)';
             vis.context.font = '25px American Typewriter';
             vis.context.fillText('F', cx-7, cy+8);
         }
+        vis.context.stroke();
     }
 
     drawTrajectory() {
@@ -323,8 +329,8 @@ class Overview {
         let vis = this;
         var pos = [];
         trj.trj.forEach((i, idx) => {
-            if(trj.trj.length >= 3000){
-                if(idx % Math.floor(trj.trj.length/3000) == 0 || (idx <= trj.trj.length-1&&idx >= trj.trj.length-10)){
+            if(trj.trj.length >= 500000000){
+                if(idx % Math.floor(trj.trj.length/5000) == 0 || (idx <= trj.trj.length-1&&idx >= trj.trj.length-10)){
                     if(i.density.size >= vis.k)
                         pos.push({x: i.pca_x, y: i.pca_y});
                 }

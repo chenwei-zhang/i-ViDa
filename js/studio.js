@@ -28,7 +28,9 @@ class Studio {
         vis.yScale = d3.scaleBand()
             .range([0, vis.height]).padding(1);
         // selection trj category
-        vis.sScale = d3.scaleOrdinal(d3.schemeDark2);
+        vis.sScale = d3.scaleOrdinal()
+        .domain([2, 0, 1])
+        .range(["#1f77b4","#2ca02c","#f0027f"]);
         // svg of the vis
         vis.svg = d3.select(vis.config.parentElement)
             .append('svg')

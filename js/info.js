@@ -143,7 +143,7 @@ class Info{
             .attr('cx', 50)
             .attr('cy', (d) => d.rank*100-50)
             .attr('r', (d) => vis.rScale(d.time))
-            .attr('fill', (d) => d3.interpolateRainbow(vis.cScale(d.energy)))
+            .attr('fill', (d) => d3.interpolatePlasma(vis.cScale(d.energy)))
             .attr('opacity', 0.5)
             .attr('strokeWidth', 1)
             .attr('stroke', '#5a5a5a');
