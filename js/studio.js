@@ -30,7 +30,7 @@ class Studio {
         // selection trj category
         vis.sScale = d3.scaleOrdinal()
         .domain([2, 0, 1])
-        .range(["#1f77b4","#2ca02c","#f0027f"]);
+        .range(["#00ffff","#2ca02c","#f0027f"]);
         // svg of the vis
         vis.svg = d3.select(vis.config.parentElement)
             .append('svg')
@@ -91,7 +91,7 @@ class Studio {
             .attr('transform', `translate(${40}, 0)`);
         vis.xAxis = d3.axisBottom(vis.xScale);
         vis.yAxis = d3.axisLeft(vis.yScale).tickSizeOuter([0]);
-        d3.select('#ctn1').append('div').attr('id', 'tooltip1');
+        d3.select('#ctn2').append('div').attr('id', 'tooltip1');
     }
 
     updateVis() {

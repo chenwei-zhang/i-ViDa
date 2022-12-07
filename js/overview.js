@@ -52,7 +52,7 @@ class Overview {
         // selection trj category
         vis.sScale = d3.scaleOrdinal()
         .domain([2, 0, 1])
-        .range(["#1f77b4","#2ca02c","#f0027f"]);
+        .range(["#00ffff","#2ca02c","#f0027f"]);
         // svg of the vis
         vis.svg = d3.select(vis.config.parentElement)
             .append('svg')
@@ -177,14 +177,58 @@ class Overview {
             .append('svg')
             .attr('id', 'overview-slider')
             .attr('width', 400)
-            .attr('height', 75)
+            .attr('height', 105)
             .append('g')
-            .attr('transform', `translate(${vis.margin.left+20}, ${vis.margin.top+20})`)
+            .attr('transform', `translate(${vis.margin.left+20}, ${vis.margin.top+30})`)
             .call(vis.filterk);
         d3.selectAll('.parameter-value').attr('font-family', 'American Typewriter').attr('fill', '#5a5a5a');
+        vis.svg
+            .append('text')
+            .text('occupancy density filter')
+            .attr('transform', `translate(${10}, ${20})`)
+            .style('color', '#5a5a5a')
+            .style('font-size', 15)
+            .style('text-align', 'center')
+            .style('text-anchor', 'left')
+            .style('pointer-events', 'none');
         // add tooltip
         d3.select(vis.config.parentElement).append('div').attr('id', 'tooltip2');
         vis.config.callToolTip(null, vis.states[vis.iID], vis);
+        // canvas-legend
+        vis.canvaslgd = d3.select(vis.config.parentElement)
+            .append('canvas')
+            .attr('class', 'overview-canvas')
+            .attr('id', 'overview-canvas-lgd')
+            .attr('width', 100)
+            .attr('height', 180)
+            .style('transform', `translate(${vis.width-70}px, ${350}px)`);
+        vis.contextlgd = vis.canvaslgd.node().getContext('2d');
+        for(var i = 0; i < 160; i++){
+            vis.contextlgd.fillStyle = d3.interpolatePlasma(1.0*(i/160));
+            vis.contextlgd.fillRect(88, i+18, 10, 1);
+        }
+        vis.contextlgd.fillStyle = 'rgb(91, 91, 91)';
+        vis.contextlgd.font = '12px American Typewriter';
+        vis.contextlgd.fillText('energy', 60, 10);
+        vis.contextlgd.fillRect(60, 18, 38, 1);
+        vis.contextlgd.fillRect(60, 178, 38, 1);
+        vis.contextlgd.font = '10px American Typewriter';
+        vis.contextlgd.fillText(-39.5, 60, 28);
+        vis.contextlgd.fillText(10.9, 60, 177);
+        vis.contextlgd.strokeStyle = 'rgb(91, 91, 91)';
+        vis.contextlgd.lineWidth = 1;
+        vis.contextlgd.beginPath();
+        vis.contextlgd.arc(40, 173, 4, 0, 2*Math.PI);
+        vis.contextlgd.stroke();
+        vis.contextlgd.fillRect(0, 168, 41, 1);
+        vis.contextlgd.beginPath();
+        vis.contextlgd.arc(40, 162, 15, 0, 2*Math.PI);
+        vis.contextlgd.stroke();
+        vis.contextlgd.fillRect(0, 146, 41, 1);
+        vis.contextlgd.fillText(0, 0, 168);
+        vis.contextlgd.fillText('3.6e-8', 0, 146);
+        vis.contextlgd.font = '12px American Typewriter';
+        vis.contextlgd.fillText('time', 20, 136);
     }
 
     updateVis() {

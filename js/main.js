@@ -60,7 +60,7 @@ d3.json('data/PT4_dna.json').then((data) => {
             {
                 parentElement: '#overview',
                 width: 900,
-                height: 700,
+                height: 660,
                 margin: {left: 30, right: 20, top: 20, bottom: 20},
                 callToolTip: callToolTip2,
             },
@@ -107,7 +107,7 @@ d3.json('data/PT4_dna.json').then((data) => {
         info = new Info(
             {
                 parentElement: '#info',
-                width: 370,
+                width: 470,
             },
             pt3_dna,
             [],
@@ -141,8 +141,16 @@ dispatcher.on('selBin', (selectedBin, sScale) => {
 dispatcher.on('selHex', (selectedData) => {
     if(!selectedData){
         info.mode = 'empty';
+        d3.select('#info').style('display', 'none');
+        d3.select('.menu').style('height', '700px');
+        d3.select('#trajectory-clip').style('height', '600px');
+        d3.select('#hex').style('border-style', 'none none none none');
     }else{
         info.mode = 'bin';
+        d3.select('#info').style('display', 'inline-block');
+        d3.select('.menu').style('height', '400px');
+        d3.select('#trajectory-clip').style('height', '300px');
+        d3.select('#hex').style('border-style', 'dashed none none none');
         info.data = selectedData;
     }
     info.updateVis();
