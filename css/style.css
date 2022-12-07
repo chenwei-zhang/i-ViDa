@@ -1,9 +1,13 @@
 body {
     font-family: American Typewriter, sans-serif;
-    background-color: #f1f1f1;
+    background-color: #ffffff;
 }
 .header {
-    height: 50px;
+    display: flex;
+    justify-content: center;
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+    background-color: #ffffff;
 }
 
 .title {
@@ -11,7 +15,8 @@ body {
     margin-block-start: 5px;
     margin-block-end: 5px;
     margin-inline-start: 30px;
-    margin-inline-end: 0px;
+    margin-inline-end: 20px;
+    border-bottom: 1px solid #5a5a5a;
 }
 .container {
     display: flex;
