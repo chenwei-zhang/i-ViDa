@@ -38,9 +38,8 @@ class Flow{
         .domain([2, 0, 1])
         .range(["#00ffff","#2ca02c","#f0027f"]);
         // scales of binning
-        vis.byScale = d3.scaleLinear().range([0, 250]);
-        vis.bxScale = d3.scaleBand().domain([1]).range([50]);
-        vis.byAxis = d3.axisBottom(vis.byScale).ticks(6);
+        vis.byScale = d3.scaleLinear().range([0, 500]);
+        vis.bxScale = d3.scaleLinear().range([0, 30]);
         // svg of the vis
         vis.svg = d3.select(vis.config.parentElement)
             .append('svg')
@@ -77,12 +76,15 @@ class Flow{
             .append('g').style('display', 'none')
             .attr('transform', `translate(1, ${vis.height-80})`);
         vis.bintool.append('rect')
-            .attr('width', 300).attr('height', 80)
+            .attr('width', 550).attr('height', 80)
             .attr('fill', '#e5ecf6')
             .attr('opacity', 0.8)
         vis.byAxisG = vis.bintool.append('g')
             .attr('class', 'axis y-axis')
             .attr('transform', `translate(25, ${60})`)
+        vis.bxAxisG = vis.bintool.append('g')
+            .attr('class', 'axis x-axis')
+            .attr('transform', `translate(25, ${30})`)
         // add text when empty
         vis.svg.append('text')
             .text('Select Trajectories to View Flow')
@@ -182,62 +184,35 @@ class Flow{
                 });
                 if(count == 1){
                     d3.select(this).attr('opacity', 0.6);
-                    d3.selectAll('.flow-box').remove().exit();
-                    d3.selectAll('.flow-toto').remove().exit();
-                    d3.selectAll('.flow-vertical').remove().exit();
                     d3.selectAll('.flow-text').remove().exit();
+                    d3.selectAll('.flow-bins').remove().exit();
                     d3.select('#flow-bin').raise();
-                    vis.byScale.domain([d3.min(data.data, (d)=>d.energy), d3.max(data.data, (d)=>d.energy)])
-                    vis.byAxisG.call(vis.byAxis);
+                    vis.byScale.domain([d3.min(data.data, (d)=>d.energy), d3.max(data.data, (d)=>d.energy)]).nice();
                     vis.bintool.style('display', 'inline-block');
-                    let energies = data.data.sort((a,b) => a.energy - b.energy);
-                    let q1 = d3.quantile(energies.map((e) => e.energy), 0.25);
-                    let q2 = d3.quantile(energies.map((e) => e.energy), 0.5);
-                    let q3 = d3.quantile(energies.map((e) => e.energy), 0.75);
-                    let min = d3.min(data.data, (d)=>d.energy);
-                    let max = d3.max(data.data, (d)=>d.energy);
-                    vis.bintool.append('line')
-                        .attr('class', 'flow-vertical')
-                        .attr('y1', 35)
-                        .attr('y2', 35)
-                        .attr('x1', (d) => vis.byScale(min)+25)
-                        .attr('x2', (d) => vis.byScale(q1)+25)
-                        .attr('stroke', '#5a5a5a')
-                    vis.bintool.append('line')
-                        .attr('class', 'flow-vertical')
-                        .attr('y1', 35)
-                        .attr('y2', 35)
-                        .attr('x1', (d) => vis.byScale(q3)+25)
-                        .attr('x2', (d) => vis.byScale(max)+25)
-                        .attr('stroke', '#5a5a5a')
-                    vis.bintool.append('rect')
-                        .attr('class', 'flow-box')
-                        .attr('y', 20)
-                        .attr('x', vis.byScale(q1)+25)
-                        .attr('width', vis.byScale(q2)-vis.byScale(q1))
-                        .attr('height', 30)
-                        .attr('fill', vis.sScale(idx))
-                        .attr('opacity', 0.4)
-                        .attr('stroke', '#5a5a5a');
-                    vis.bintool.append('rect')
-                        .attr('class', 'flow-box')
-                        .attr('y', 20)
-                        .attr('x', vis.byScale(q2)+25)
-                        .attr('width', vis.byScale(q3)-vis.byScale(q2))
-                        .attr('height', 30)
-                        .attr('fill', vis.sScale(idx))
-                        .attr('opacity', 0.6)
-                        .attr('stroke', '#5a5a5a');
-                    vis.bintool.selectAll('.flow-toto')
-                        .data([min, max])
+                    var hist = d3.histogram()
+                        .value((d) => d.energy)
+                        .domain(vis.byScale.domain())
+                        .thresholds(vis.byScale.ticks(20));
+                    var bins = hist(data.data);
+                    vis.byScale.ticks(bins.length)
+                    vis.byAxis = d3.axisBottom(vis.byScale);
+                    vis.bxAxis = d3.axisLeft(vis.bxScale);
+                    vis.byAxisG.call(vis.byAxis);
+                    vis.bxScale.domain([0, d3.max(bins, (d)=>d.length)])
+                    console.log(bins);
+                    vis.bintool.selectAll('.flow-bins')
+                        .data(bins)
                         .enter()
-                        .append('line')
-                        .attr('class', 'flow-toto')
-                        .attr('y1', 20)
-                        .attr('y2', 50)
-                        .attr('x1', (d) => vis.byScale(d)+25)
-                        .attr('x2', (d) => vis.byScale(d)+25)
-                        .attr('stroke', '#5a5a5a')
+                        .append('rect')
+                        .attr('class', 'flow-bins')
+                        .attr('x', 1)
+                        .attr('transform', (d) => `translate(${vis.byScale(d.x0)+25}, ${30-vis.bxScale(d.length)+30})`)
+                        .attr('width', (d) => {return vis.byScale(d.x1)-vis.byScale(d.x0)})
+                        .attr('height', (d) => {return vis.bxScale(d.length)})
+                        .attr('fill', vis.sScale(idx))
+                        .attr('stroke', '#ffffff')
+                        .attr('stroke-width', 1)
+                        .attr('opacity', 0.5)
                     vis.bintool.append('text')
                         .attr('class', 'flow-text')
                         .text(`# of hops: ${data.data.length}`)

@@ -23,6 +23,11 @@ d3.json('data/PT4_dna.json').then((data) => {
             pht_x: dna.PHATE_X,
             pht_y: dna.PHATE_Y,
             density: new Set(),
+            top: dna.intrapair_top,
+            btm: dna.intrapair_bot,
+            cor: dna.correct_interpair,
+            tol: dna.total_interpair,
+            binding: dna.binding,
         };
         pt3_dna.push(dna_data);
     });
@@ -177,10 +182,15 @@ const callToolTip2 = function(e, d, vis) {
         .html(
             `
             <div style='font-size:10px'>
-                <br> DP: ${d.dp}<br>
-                <br> Energy: ${d.energy}<br>
-                <br> Time: ${d.time}<br>
-                <br> Density: ${d.density.size} ${d.density.size<=5? '['+[...d.density].join(' ')+']':''}<br>
+                <br> <strong>DP:</strong> ${d.dp}<br>
+                <br> <strong>Energy:</strong> ${d.energy} &nbsp; 
+                <strong>Time:</strong> ${d.time} &nbsp;
+                <strong>Density:</strong> ${d.density.size} ${d.density.size<=5? '['+[...d.density].join(' ')+']':''}<br>
+                <br> <strong>Intra-strand bp(top):</strong> ${d.top}</br>
+                <br> <strong>Intra-strand bp(btm):</strong> ${d.btm}</br>
+                <br> <strong>Corrected inter-strand bp:</strong> ${d.cor}</br>
+                <br> <strong>Total inter-strand bp:</strong> ${d.tol}</br>
+                <br> <strong>Binding:</strong> ${d.binding}</br>
             </div>
             `
         );

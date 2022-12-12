@@ -57,8 +57,8 @@ class Hexbin{
         vis.svg
             .append('text')
             .text('I')
-            .attr('x', vis.xScale(vis.states[0].pca_x)-4)
-            .attr('y', vis.yScale(vis.states[0].pca_y)+5)
+            .attr('x', vis.xScale(vis.states[0].pca_x)-3)
+            .attr('y', vis.yScale(vis.states[0].pca_y)-3)
             .style('font-size', 10)
             .style('text-anchor', 'middle');;
         vis.svg
@@ -78,6 +78,28 @@ class Hexbin{
         vis.cScale.domain([d3.min(vis.bin, (b)=>b.length), d3.max(vis.bin, (b)=>b.length)])
         vis.hb = vis.svg.selectAll('.hexbin-bin')
             .data(vis.bin);
+
+        vis.canvaslgd = d3.select(vis.config.parentElement)
+            .append('canvas')
+            .attr('class', 'overview-canvas')
+            .attr('id', 'overview-canvas-lgd')
+            .attr('width', 70)
+            .attr('height', 135)
+            .style('transform', `translate(${-93}px, ${80}px)`);
+        vis.contextlgd = vis.canvaslgd.node().getContext('2d');
+        for(let i = 0; i < 110; i++){
+            const a = vis.cScale((110-i)/110*d3.min(vis.bin, (b)=>b.length)+i/110*d3.max(vis.bin, (b)=>b.length));
+            vis.contextlgd.fillStyle = `rgb(102, 143, 255, ${a})`;
+            vis.contextlgd.fillRect(60, i+20, 10, 1);
+        }
+        vis.contextlgd.fillStyle = `rgb(91, 91, 91)`;
+        vis.contextlgd.fillRect(38, 20, 32, 1);
+        vis.contextlgd.fillRect(38, 130, 32, 1);
+        vis.contextlgd.font = '12px American Typewriter';
+        vis.contextlgd.fillText('count', 38, 16);
+        vis.contextlgd.font = '8px American Typewriter';
+        vis.contextlgd.fillText(d3.min(vis.bin, (b)=>b.length), 38, 30)
+        vis.contextlgd.fillText(d3.max(vis.bin, (b)=>b.length), 38, 128)
         vis.renderVis();
     }
 
@@ -92,16 +114,17 @@ class Hexbin{
             .attr('d', vis.hex.hexagon())
             .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
             .attr('fill', '#668fff')
-            .attr('opacity', (d) => vis.cScale(d.length))
+            .attr('fill-opacity', (d) => vis.cScale(d.length))
             .attr('stroke', '#5a5a5a')
             .attr('stroke-width', 1)
+            .attr('stroke-opacity', 0.3)
             .on('mousemove', function(e, d) {
                 d3.select('#tooltip3').style('display', 'inline-block');
                 vis.config.callToolTip(e, d, vis);
-                d3.select(this).attr('stroke-width', 3);
+                d3.select(this).attr('stroke-width', 3).attr('stroke-opacity', 1);
             }).on('mouseout', function() {
                 d3.select('#tooltip3').style('display', 'none');
-                d3.selectAll('.hexbin-bin').attr('stroke-width', 1);
+                d3.selectAll('.hexbin-bin').attr('stroke-width', 1).attr('stroke-opacity', 0.3);
             });
     }
 

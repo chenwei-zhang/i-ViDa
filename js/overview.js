@@ -199,9 +199,9 @@ class Overview {
             .append('canvas')
             .attr('class', 'overview-canvas')
             .attr('id', 'overview-canvas-lgd')
-            .attr('width', 100)
+            .attr('width', 110)
             .attr('height', 180)
-            .style('transform', `translate(${vis.width-70}px, ${350}px)`);
+            .style('transform', `translate(${vis.width-73}px, ${350}px)`);
         vis.contextlgd = vis.canvaslgd.node().getContext('2d');
         for(var i = 0; i < 160; i++){
             vis.contextlgd.fillStyle = d3.interpolatePlasma(1.0*(i/160));
@@ -218,17 +218,17 @@ class Overview {
         vis.contextlgd.strokeStyle = 'rgb(91, 91, 91)';
         vis.contextlgd.lineWidth = 1;
         vis.contextlgd.beginPath();
-        vis.contextlgd.arc(40, 173, 4, 0, 2*Math.PI);
+        vis.contextlgd.arc(30, 173, 4, 0, 2*Math.PI);
         vis.contextlgd.stroke();
-        vis.contextlgd.fillRect(0, 168, 41, 1);
+        vis.contextlgd.fillRect(0, 168, 31, 1);
         vis.contextlgd.beginPath();
-        vis.contextlgd.arc(40, 162, 15, 0, 2*Math.PI);
+        vis.contextlgd.arc(30, 162, 15, 0, 2*Math.PI);
         vis.contextlgd.stroke();
-        vis.contextlgd.fillRect(0, 146, 41, 1);
+        vis.contextlgd.fillRect(0, 146, 31, 1);
         vis.contextlgd.fillText(0, 0, 168);
         vis.contextlgd.fillText('3.6e-8', 0, 146);
         vis.contextlgd.font = '12px American Typewriter';
-        vis.contextlgd.fillText('time', 20, 136);
+        vis.contextlgd.fillText('time', 0, 134);
     }
 
     updateVis() {

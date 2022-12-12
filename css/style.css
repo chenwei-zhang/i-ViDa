@@ -188,8 +188,9 @@ body {
     background: #e5ecf6;
     border: 2px;
     opacity: 0.8;
-    pointer-events: none;
+    pointer-events: auto;
     z-index: 6;
+    overflow-y: scroll;
 }
 
 #tooltip3 {
