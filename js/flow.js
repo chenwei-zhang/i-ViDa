@@ -215,7 +215,6 @@ class Flow{
                     vis.bxAxis = d3.axisLeft(vis.bxScale);
                     vis.byAxisG.call(vis.byAxis);
                     vis.bxScale.domain([0, d3.max(bins, (d)=>d.length)])
-                    console.log(bins);
                     vis.bintool.selectAll('.flow-bins')
                         .data(bins)
                         .enter()
