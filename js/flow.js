@@ -31,7 +31,7 @@ class Flow{
         })
         // yscale
         vis.yScale = d3.scaleLinear()
-            .domain([d3.max(trjmax), d3.min(trjmin)-1])
+            .domain([d3.max(trjmax)+5, d3.min(trjmin)-5])
             .range([0, vis.height]);
         // selection trj category
         vis.sScale = d3.scaleOrdinal()
@@ -57,8 +57,10 @@ class Flow{
             .attr('x', 0)
             .attr('y', 0);
         // axis group
-        vis.xAxis = d3.axisBottom(vis.xScale).tickFormat((x) => `${x+'%'}`).tickSize(-vis.height);
-        vis.yAxis = d3.axisLeft(vis.yScale).ticks(4).tickSizeOuter(-vis.width);
+        vis.xAxis = d3.axisBottom(vis.xScale).tickFormat((x) => `${x+'%'}`)
+            .tickSize(-vis.height)
+            .tickPadding(5);
+        vis.yAxis = d3.axisLeft(vis.yScale).ticks(8).tickSizeOuter(-vis.width);
         vis.xAxisG = vis.svg
             .append('g')
             .attr('class', 'axis x-axis')
@@ -94,6 +96,20 @@ class Flow{
             .style('text-align', 'center')
             .style('text-anchor', 'middle')
             .style('opacity', 0.3)
+            .style('pointer-events', 'none');
+        vis.svg.append('text')
+            .text('energy kcal/mol')
+            .attr('transform', `translate(50, 15)`)
+            .style('font-size', 12)
+            .style('text-align', 'center')
+            .style('text-anchor', 'middle')
+            .style('pointer-events', 'none');
+        vis.svg.append('text')
+            .text('time')
+            .attr('transform', `translate(835, 265)`)
+            .style('font-size', 12)
+            .style('text-align', 'center')
+            .style('text-anchor', 'middle')
             .style('pointer-events', 'none');
     }
 

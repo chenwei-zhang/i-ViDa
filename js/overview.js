@@ -32,10 +32,12 @@ class Overview {
         vis.scaleExtra = 1.1;
         vis.yScale = d3.scaleLinear()
             .domain([d3.min(vis.states, (d) => d.pca_y)*vis.scaleExtra, d3.max(vis.states, (d) => d.pca_y)*vis.scaleExtra])
-            .range([vis.height, 0]);
+            .range([vis.height, 0])
+            .nice();
         vis.xScale = d3.scaleLinear()
             .domain([d3.min(vis.states, (d) => d.pca_x)*vis.scaleExtra, d3.max(vis.states, (d) => d.pca_x)*vis.scaleExtra])
-            .range([0, vis.width]);
+            .range([0, vis.width])
+            .nice();
         // color scale
         vis.cScale = d3.scaleLinear()
             .domain([d3.min(vis.states, (d)=> d.energy), d3.max(vis.states, (d)=> d.energy)])
@@ -116,8 +118,12 @@ class Overview {
             .style('transform', `translate(${vis.margin.left}px, ${vis.margin.top}px)`);
         vis.contextVor = vis.canvasVor.node().getContext('2d');
         // axis group
-        vis.xAxis = d3.axisBottom(vis.xScale).tickSize(-vis.height);
-        vis.yAxis = d3.axisLeft(vis.yScale).tickSize(-vis.width);
+        vis.xAxis = d3.axisBottom(vis.xScale).tickSize(-vis.height)
+            .tickFormat((d, i) => (d==16)? "x" : d)
+            .tickPadding(5);
+        vis.yAxis = d3.axisLeft(vis.yScale).tickSize(-vis.width)
+            .tickFormat((d, i) => (d==16)? "y" : d)
+            .tickPadding(5);
         vis.xAxisG = vis.svg
             .append('g')
             .attr('class', 'axis x-axis')
