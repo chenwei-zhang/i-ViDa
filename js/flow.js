@@ -35,7 +35,7 @@ class Flow{
             .range([0, vis.height]);
         // selection trj category
         vis.sScale = d3.scaleOrdinal()
-        .domain([2, 0, 1])
+        .domain([1, 0, 2])
         .range(["#00ffff","#2ca02c","#f0027f"]);
         // scales of binning
         vis.byScale = d3.scaleLinear().range([0, 500]);

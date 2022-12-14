@@ -187,7 +187,7 @@ body {
     padding: 2px;
     background: #e5ecf6;
     border: 2px;
-    opacity: 0.8;
+    opacity: 1.0;
     pointer-events: auto;
     z-index: 6;
     overflow-y: scroll;

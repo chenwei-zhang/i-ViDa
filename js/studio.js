@@ -29,7 +29,7 @@ class Studio {
             .range([0, vis.height]).padding(1);
         // selection trj category
         vis.sScale = d3.scaleOrdinal()
-        .domain([2, 0, 1])
+        .domain([1, 0, 2])
         .range(["#00ffff","#2ca02c","#f0027f"]);
         // svg of the vis
         vis.svg = d3.select(vis.config.parentElement)

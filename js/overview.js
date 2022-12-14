@@ -53,7 +53,7 @@ class Overview {
 
         // selection trj category
         vis.sScale = d3.scaleOrdinal()
-        .domain([2, 0, 1])
+        .domain([1, 0, 2])
         .range(["#00ffff","#2ca02c","#f0027f"]);
         // svg of the vis
         vis.svg = d3.select(vis.config.parentElement)
@@ -379,7 +379,7 @@ class Overview {
         let vis = this;
         var pos = [];
         trj.trj.forEach((i, idx) => {
-            if(trj.trj.length >= 500000000){
+            if(trj.trj.length >= 5000){
                 if(idx % Math.floor(trj.trj.length/5000) == 0 || (idx <= trj.trj.length-1&&idx >= trj.trj.length-10)){
                     if(i.density.size >= vis.k)
                         pos.push({x: i.pca_x, y: i.pca_y});
@@ -414,8 +414,10 @@ class Overview {
         let extent = event.selection;
         if(!extent){
             if (!idleTimeout) return idleTimeout = setTimeout(vis.idled, 350);
-            vis.xScale.domain([d3.min(vis.states, (d)=> d.pca_x)*vis.scaleExtra, d3.max(vis.states, (d)=> d.pca_x)*vis.scaleExtra]);
-            vis.yScale.domain([d3.min(vis.states, (d)=> d.pca_y)*vis.scaleExtra, d3.max(vis.states, (d)=> d.pca_y)*vis.scaleExtra]);
+            vis.xScale.domain([d3.min(vis.states, (d)=> d.pca_x)*vis.scaleExtra, d3.max(vis.states, (d)=> d.pca_x)*vis.scaleExtra])
+                .nice();
+            vis.yScale.domain([d3.min(vis.states, (d)=> d.pca_y)*vis.scaleExtra, d3.max(vis.states, (d)=> d.pca_y)*vis.scaleExtra])
+                .nice();
         }else{
             vis.xScale.domain([vis.xScale.invert(extent[0][0]), vis.xScale.invert(extent[1][0])]);
             vis.yScale.domain([vis.yScale.invert(extent[1][1]), vis.yScale.invert(extent[0][1])]);
@@ -426,8 +428,8 @@ class Overview {
         vis.drawTrajectory();
         vis.drawStates();
         vis.drawSelection(vis.seldna);
-        vis.xAxisG.call(d3.axisBottom(vis.xScale).tickSize(-vis.height));
-        vis.yAxisG.call(d3.axisLeft(vis.yScale).tickSize(-vis.width));
+        vis.xAxisG.call(vis.xAxis);
+        vis.yAxisG.call(vis.yAxis);
     }
 
     displayTooltipStates(event) {
